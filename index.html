@@ -1,0 +1,1871 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>동물원 — 나와 함께 걷는 네 마리</title>
+<style>
+:root{
+  --bg:#FBF7EF; --card:#FFFFFF; --ink:#3A3128; --sub:#8B7E6D; --line:#EDE4D4;
+  --pt:#F0885A;            
+  --good:#5FA86E; --bad:#D9705F; --mid:#C9A227;
+  --fam:#6FA8DC; --acq:#8FBF7F; --lov:#E8899E; --wrk:#A98FD0;
+  --shadow:0 2px 10px rgba(122,100,70,.08);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{
+  background:var(--bg); color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Pretendard','Malgun Gothic',sans-serif;
+  font-size:15px; line-height:1.6; padding-bottom:76px;
+}
+.wrap{max-width:520px;margin:0 auto;padding:0 16px}
+h1,h2,h3{margin:0;font-weight:800;letter-spacing:-.02em}
+button{font-family:inherit;font-size:inherit;cursor:pointer;border:none;background:none;color:inherit}
+input,select{font-family:inherit;font-size:16px}
+
+#preview-bar{position:sticky;top:0;z-index:40;background:#3A3128;color:#fff;font-size:12.5px;
+  padding:9px 16px;display:flex;align-items:center;gap:10px;justify-content:center;flex-wrap:wrap}
+#preview-bar button{background:rgba(255,255,255,.18);color:#fff;font-weight:700;font-size:12px;
+  border-radius:999px;padding:5px 12px}
+#preview-bar.hide{display:none}
+.topbar{position:sticky;top:0;z-index:20;background:rgba(251,247,239,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.topbar .wrap{display:flex;align-items:center;gap:8px;height:52px}
+.logo{font-weight:900;font-size:18px;letter-spacing:-.03em}
+.logo span{color:var(--pt)}
+.todaychip{margin-left:auto;font-size:12px;background:#fff;border:1px solid var(--line);border-radius:999px;padding:5px 11px;box-shadow:var(--shadow);white-space:nowrap}
+
+.card{background:var(--card);border-radius:20px;padding:18px;box-shadow:var(--shadow);margin:14px 0}
+.muted{color:var(--sub)}
+.small{font-size:13px}
+.tiny{font-size:12px}
+.btn{display:block;width:100%;background:var(--pt);color:#fff;font-weight:800;border-radius:16px;padding:15px;text-align:center;letter-spacing:-.02em}
+.btn:active{transform:translateY(1px)}
+.btn.ghost{background:#fff;color:var(--ink);border:1.5px solid var(--line)}
+.btn.sm{padding:11px;border-radius:13px;font-size:14px}
+.row{display:flex;gap:8px}
+.row>*{flex:1}
+label.fld{display:block;margin:14px 0 6px;font-weight:700;font-size:13.5px}
+.inp{width:100%;padding:13px 14px;border:1.5px solid var(--line);border-radius:14px;background:#fff;color:var(--ink)}
+.inp:focus{outline:none;border-color:var(--pt)}
+.chkline{display:flex;align-items:center;gap:8px;margin-top:9px;font-size:13.5px;color:var(--sub)}
+.chkline input{width:17px;height:17px;accent-color:var(--pt)}
+.note{background:#FFF6EC;border:1px solid #F6E0C8;border-radius:14px;padding:11px 13px;font-size:12.5px;color:#8a6a45;line-height:1.55}
+
+.zoo{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
+.beast{background:#fff;border:1.5px solid var(--line);border-radius:18px;padding:13px 7px;text-align:center;position:relative;overflow:hidden}
+.beast.hero{grid-column:1/-1;background:linear-gradient(160deg,#FFF3E7,#FFF9F2);border-color:#F6DCC2}
+.beast .face{font-size:32px;line-height:1;display:block;margin-bottom:5px}
+.beast.hero .face{font-size:58px}
+.beast .who{font-size:10px;color:var(--sub);letter-spacing:-.03em;line-height:1.3}
+.beast.hero .who{font-size:11.5px;letter-spacing:-.01em}
+.beast .nm{font-weight:800;font-size:14.5px;margin-top:2px}
+.beast.hero .nm{font-size:19px}
+.beast .tr{font-size:10.5px;color:var(--sub);margin-top:3px;line-height:1.4;letter-spacing:-.03em}
+.beast.hero .tr{font-size:12.5px;letter-spacing:-.01em}
+.beast .badge{position:absolute;top:9px;right:10px;font-size:10px;background:var(--pt);color:#fff;border-radius:999px;padding:2px 7px;font-weight:700}
+.beast.empty{background:#FAF6EF;border-style:dashed;color:var(--sub)}
+.beast.empty .face{opacity:.35;filter:grayscale(1)}
+
+.scorebig{text-align:center;padding:6px 0 2px}
+.scorebig .n{font-size:60px;font-weight:900;letter-spacing:-.05em;line-height:1}
+.scorebig .n small{font-size:20px;font-weight:800;color:var(--sub)}
+.scorebig .lbl{font-weight:800;margin-top:6px;font-size:17px}
+.bar{height:9px;border-radius:99px;background:#F0E9DC;overflow:hidden;margin:14px 0 4px}
+.bar>i{display:block;height:100%;border-radius:99px}
+
+.meet{display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px dashed var(--line)}
+.meet:first-of-type{border-top:none}
+.meet .pair{font-size:22px;white-space:nowrap;letter-spacing:-2px}
+.meet .txt{flex:1;min-width:0}
+.meet .t1{font-weight:700;font-size:13.5px}
+.meet .t2{font-size:12px;color:var(--sub);line-height:1.4}
+.meet .sc{font-weight:800;font-size:13px;white-space:nowrap}
+
+.seg{display:flex;background:#F2EADF;border-radius:14px;padding:4px;gap:4px;margin:12px 0}
+.seg button{flex:1;padding:9px 0;border-radius:11px;font-size:13.5px;font-weight:700;color:var(--sub)}
+.seg button.on{background:#fff;color:var(--ink);box-shadow:var(--shadow)}
+
+.nav{position:fixed;bottom:0;left:0;right:0;background:rgba(255,255,255,.96);backdrop-filter:blur(8px);border-top:1px solid var(--line);z-index:30}
+.nav .wrap{display:flex;height:62px}
+.nav button{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:10.5px;color:var(--sub);font-weight:600}
+.nav button .ic{font-size:20px;line-height:1}
+.nav button.on{color:var(--pt)}
+
+.legend{display:flex;gap:12px;justify-content:center;font-size:12px;color:var(--sub);margin-top:8px}
+.legend i{display:inline-block;width:9px;height:9px;border-radius:99px;margin-right:4px;vertical-align:middle}
+.flist{margin-top:6px}
+.fitem{display:flex;align-items:center;gap:11px;padding:11px 2px;border-bottom:1px solid var(--line)}
+.fitem:last-child{border-bottom:none}
+.fav{width:42px;height:42px;border-radius:99px;display:flex;align-items:center;justify-content:center;font-size:23px;border:2.5px solid;background:#fff;flex-shrink:0}
+.fitem .nmm{font-weight:700;font-size:14.5px}
+.fitem .sub{font-size:11.5px;color:var(--sub)}
+.fitem .sc{margin-left:auto;font-weight:900;font-size:18px}
+
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-top:10px}
+.cal .dow{text-align:center;font-size:11px;color:var(--sub);font-weight:700;padding:4px 0}
+.cell{aspect-ratio:1;border-radius:11px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:11px;border:1px solid transparent;position:relative}
+.cell .d{font-weight:700;font-size:11.5px}
+.cell .a{font-size:15px;line-height:1}
+.cell.today{border-color:var(--pt);border-width:2px}
+.cell.blank{background:none}
+.mrow{display:flex;gap:5px;overflow-x:auto;padding:2px 0 6px;-webkit-overflow-scrolling:touch}
+.mchip{flex:0 0 auto;border-radius:13px;padding:8px 10px;text-align:center;min-width:58px;border:1px solid var(--line);background:#fff}
+.mchip .mn{font-size:11px;color:var(--sub);font-weight:700}
+.mchip .me{font-size:18px;line-height:1.2}
+.mchip .ms{font-size:11px;font-weight:800}
+
+.hblocks{display:grid;grid-template-columns:repeat(2,1fr);gap:7px}
+.hblk{display:flex;align-items:center;gap:9px;border:1.5px solid var(--line);background:#fff;border-radius:14px;padding:10px 9px;text-align:left}
+.hblk.on{border-color:var(--pt);background:#FFF3E7}
+.hblk .he{font-size:22px;line-height:1}
+.hblk .hn{font-weight:800;font-size:13px}
+.hblk .hr{font-size:10.5px;color:var(--sub);letter-spacing:-.03em}
+
+.hide{display:none!important}
+.center{text-align:center}
+.loop{margin-top:12px;display:grid;gap:6px}
+.lp{display:flex;align-items:flex-start;gap:9px;font-size:13px;background:#FBF7EF;border-radius:12px;padding:9px 11px;line-height:1.45}
+.lp .ln{flex-shrink:0;width:19px;height:19px;border-radius:99px;background:var(--pt);color:#fff;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;margin-top:1px}
+.copybox{background:#F7F2E8;border:1.5px dashed var(--line);border-radius:14px;padding:12px;font-size:11.5px;word-break:break-all;color:var(--sub);font-family:ui-monospace,Menlo,monospace;max-height:96px;overflow:auto}
+.toast{position:fixed;left:50%;bottom:82px;transform:translateX(-50%);background:#3A3128;color:#fff;padding:11px 18px;border-radius:99px;font-size:13.5px;font-weight:700;z-index:99;opacity:0;pointer-events:none;transition:opacity .2s}
+.toast.on{opacity:.95}
+.hr{height:1px;background:var(--line);margin:16px 0}
+.tagpill{display:inline-block;font-size:11px;font-weight:700;border-radius:999px;padding:3px 9px;color:#fff}
+
+.capchip{margin-left:auto;font-size:11.5px;font-weight:700;background:#F2EADF;color:var(--sub);border-radius:999px;padding:4px 10px;white-space:nowrap}
+.capchip.full{background:#FFF0E4;color:var(--pt)}
+.capchip.pro{background:linear-gradient(135deg,#F0885A,#E8899E);color:#fff}
+.paywall{background:linear-gradient(165deg,#FFF6EC,#FFF);border:1.5px solid #F6DCC2;border-radius:18px;padding:16px;margin-top:14px}
+.paywall h4{margin:0;font-size:15.5px;font-weight:800}
+.plan{display:flex;align-items:center;gap:11px;border:1.5px solid var(--line);background:#fff;border-radius:15px;padding:13px 14px;margin-top:9px;width:100%;text-align:left}
+.plan.best{border-color:var(--pt);background:#FFFBF7}
+.plan .pt{flex:1}
+.plan .pn{font-weight:800;font-size:14.5px}
+.plan .pd{font-size:11.5px;color:var(--sub);line-height:1.4}
+.plan .pp{font-weight:900;font-size:16px;white-space:nowrap}
+.plan[disabled]{opacity:.5}
+.kakao{background:#FEE500;color:#191600;font-weight:800;border-radius:14px;padding:13px;width:100%;text-align:center;font-size:14.5px}
+.acctrow{display:flex;align-items:center;gap:10px}
+.acctrow .av{width:36px;height:36px;border-radius:99px;background:#F2EADF;display:flex;align-items:center;justify-content:center;font-size:18px}
+.cmp{width:100%;border-collapse:collapse;margin:12px 0 4px;font-size:11.5px}
+.cmp th,.cmp td{padding:7px 6px;text-align:center;border-bottom:1px solid var(--line)}
+.cmp td:first-child,.cmp th:first-child{text-align:left;font-weight:700;width:38%}
+.cmp thead th{font-size:11px;color:var(--sub);border-bottom:1.5px solid var(--line)}
+.cmp .pro{color:var(--pt);font-weight:800;background:#FFF8F2}
+.cmp tbody td{color:var(--sub)}
+.cmp tbody td.pro{color:var(--pt)}
+.prolock{background:#FFF6EC;border:1px dashed #F0C9A6;border-radius:14px;padding:12px 13px;text-align:center;font-size:12.5px;color:#8a6a45;line-height:1.5}
+.prolock b{color:var(--pt)}
+
+.tips{display:grid;gap:7px}
+.tip{display:flex;align-items:center;gap:11px;background:#FBF7EF;border-radius:14px;padding:10px 12px}
+.tip .te{font-size:21px;line-height:1;width:26px;text-align:center;flex-shrink:0}
+.tip .tl{font-size:10.5px;color:var(--sub);font-weight:700}
+.tip .tv{font-size:13.5px;font-weight:700;line-height:1.35}
+
+.disc{margin-top:12px;padding-top:10px;border-top:1px solid var(--line);
+  font-size:11px;line-height:1.5;color:#A99C8A;letter-spacing:-.02em}
+</style>
+</head>
+<body>
+
+<div id="preview-bar" class="hide"></div>
+<div class="topbar"><div class="wrap">
+  <div class="logo" id="logo">🐾 동물<span>원</span></div>
+  <div class="todaychip" id="todaychip">—</div>
+</div></div>
+
+<div class="wrap">
+
+<!-- ============ 0. 시작 / 입력 ============ -->
+<section id="v-input">
+  <div class="card center" style="padding-top:26px">
+    <div style="font-size:44px;letter-spacing:-6px">🐯🐰🐴🐭</div>
+    <h1 style="font-size:22px;margin-top:12px;line-height:1.4;letter-spacing:-.03em">인생은 네 마리의 동물과<br>함께 걷는 여행입니다.</h1>
+    <p class="small muted" style="margin:12px 0 0">사주팔자의 네 기둥은 원래 열두 동물에서 시작되었습니다.<br>생년월일 속에 숨겨진 나만의 네 마리 동물을 만나보세요.</p>
+  </div>
+
+  <div class="card">
+    <div id="inviteFrom" class="note hide" style="margin-bottom:4px"></div>
+    <div id="addingFrom" class="note hide" style="margin-bottom:4px"></div>
+
+    <div id="cat-pick" class="hide">
+      <label class="fld">어떤 사이인가요?</label>
+      <div class="seg" id="seg-newcat">
+        <button data-c="가족">가족</button><button data-c="직장">직장</button>
+        <button data-c="친구" class="on">친구</button><button data-c="연인">연인</button>
+      </div>
+    </div>
+
+    <label class="fld">이름 <span class="muted" style="font-weight:400">(별명도 좋아요)</span></label>
+    <input class="inp" id="f-name" placeholder="예: 다현" maxlength="12">
+
+    <label class="fld">생년월일 <span style="color:var(--pt)">*</span></label>
+    <div class="seg" id="seg-cal" style="margin:6px 0 8px">
+      <button data-t="solar" class="on">양력</button>
+      <button data-t="lunar">음력</button>
+    </div>
+    <input class="inp" id="f-date" type="date" value="1990-05-15" min="1900-01-01" max="2030-12-31">
+    <div id="lunar-fields" class="hide">
+      <div class="row">
+        <select class="inp" id="l-y"></select>
+        <select class="inp" id="l-m"></select>
+        <select class="inp" id="l-d"></select>
+      </div>
+      <div class="chkline" id="l-leap-row"><input type="checkbox" id="l-leap"><label for="l-leap" id="l-leap-label">윤달</label></div>
+      <div id="l-preview" class="note" style="margin-top:10px"></div>
+    </div>
+
+    <label class="fld">태어난 시간 <span class="muted" style="font-weight:400">(선택)</span></label>
+    <div class="seg" id="seg-time" style="margin:6px 0 8px">
+      <button data-t="exact" class="on">시각으로</button>
+      <button data-t="block">동물 시간으로</button>
+      <button data-t="none">몰라요</button>
+    </div>
+    <div id="time-exact">
+      <input class="inp" id="f-time" type="time" value="08:30">
+      <div id="time-hint" class="note" style="margin-top:9px"></div>
+    </div>
+    <div id="time-block" class="hide">
+      <p class="tiny muted" style="margin:0 0 8px">대략 언제쯤인지만 아셔도 괜찮아요. 시간대를 고르면 됩니다.</p>
+      <div id="hour-blocks"></div>
+    </div>
+    <input type="checkbox" id="f-notime" class="hide">
+
+    <div class="chkline" style="margin-top:12px"><input type="checkbox" id="f-solar" checked><label for="f-solar">진태양시 보정 (서울 기준 약 32분) — 켜기 권장</label></div>
+
+    <div style="margin-top:16px"><button class="btn" id="btn-go">내 동물 만나기</button></div>
+  </div>
+</section>
+
+<!-- ============ 1. 내 동물원 ============ -->
+<section id="v-zoo" class="hide">
+  <div class="card">
+    <div style="display:flex;align-items:baseline;gap:8px">
+      <h2 style="font-size:19px" id="zoo-title">나의 네 마리</h2>
+      <button class="tiny muted" id="btn-edit" style="margin-left:auto;text-decoration:underline">고치기</button>
+    </div>
+    <div class="small muted" id="zoo-sub" style="margin-top:2px"></div>
+    <div class="zoo" id="zoo-grid"></div>
+  </div>
+
+  <div class="card">
+    <h3 style="font-size:16px">이 네 마리는 무엇인가요</h3>
+    <p class="small muted" style="margin:8px 0 0">태어난 <b>해·달·날·시</b>마다 동물이 한 마리씩 있어요. 그래서 누구나 네 마리예요.<br><br>
+    <b>네 마리가 전부 나예요.</b> 어디서 누구랑 있느냐에 따라 앞에 나서는 동물이 달라질 뿐이에요.
+    처음 만난 사람 앞에서 나오는 동물이 있고, 집에서 편할 때 나오는 동물이 따로 있어요.</p>
+    <div class="hr"></div>
+    <div id="pillar-explain" class="small"></div>
+  </div>
+
+  <div class="card">
+    <h3 style="font-size:16px">내 안의 다섯 기운 <span class="tiny muted" style="font-weight:400">오행</span></h3>
+    <div id="my-oh" style="margin-top:10px"></div>
+  </div>
+
+  <div class="card">
+    <h3 style="font-size:16px">나는 힘이 센 편일까 <span class="tiny muted" style="font-weight:400">신강·신약</span></h3>
+    <div id="my-str" style="margin-top:10px"></div>
+  </div>
+
+  <div class="card">
+    <h3 style="font-size:16px">사주 원국 <span class="tiny muted" style="font-weight:400">(궁금한 분만)</span></h3>
+    <div id="raw-pillars" class="small muted" style="margin-top:8px;font-family:ui-monospace,monospace"></div>
+    <div id="raw-warn" class="note hide" style="margin-top:10px"></div>
+  </div>
+
+  <button class="btn" id="btn-toinvite" style="margin-bottom:8px">친구는 무슨 동물일까? 초대하기</button>
+</section>
+
+<!-- ============ 2. 관계도 ============ -->
+<section id="v-map" class="hide">
+  <div class="card" id="acct-card" style="padding:14px 16px">
+    <div id="acct-body"></div>
+  </div>
+
+  <div class="card" id="plan-card" style="padding:14px 16px">
+    <button id="btn-plan" style="width:100%;display:flex;align-items:center;gap:8px;text-align:left">
+      <span id="plan-title" style="font-weight:700;font-size:14px">기본과 프로, 뭐가 다른가요?</span>
+      <span id="plan-badge"></span>
+      <span id="plan-arrow" style="margin-left:auto;color:var(--sub)">▾</span>
+    </button>
+    <div id="plan-body" class="hide" style="margin-top:10px"></div>
+  </div>
+
+  <div class="card">
+    <div style="display:flex;align-items:baseline">
+      <h2 style="font-size:19px" id="map-title">나의 동물원</h2>
+      <span class="capchip" id="cap-chip"></span>
+    </div>
+    <div class="small muted" style="margin-top:2px" id="map-sub"></div>
+    <div id="paywall" class="hide"></div>
+    <div class="seg" id="seg-cat">
+      <button data-c="all" class="on">전체</button>
+      <button data-c="가족">가족</button>
+      <button data-c="직장">직장</button>
+      <button data-c="친구">친구</button>
+      <button data-c="연인">연인</button>
+    </div>
+    <div id="map-svg"></div>
+    <div class="legend">
+      <span><i style="background:var(--fam)"></i>가족</span>
+      <span><i style="background:var(--wrk)"></i>직장</span>
+      <span><i style="background:var(--acq)"></i>친구</span>
+      <span><i style="background:var(--lov)"></i>연인</span>
+      <span><i style="background:var(--good)"></i>합</span>
+      <span><i style="background:var(--bad)"></i>충</span>
+    </div>
+    <div class="flist" id="map-list"></div>
+  </div>
+  <div class="card">
+    <h3 style="font-size:15px">친구가 보낸 코드 붙여넣기</h3>
+    <p class="tiny muted" style="margin:6px 0 10px">친구가 내 링크로 궁합을 본 뒤 보내준 코드를 여기에 넣으면 동물원에 들어와요.</p>
+    <input class="inp" id="f-paste" placeholder="ZOO-... 코드 붙여넣기">
+    <div style="margin-top:8px"><button class="btn sm ghost" id="btn-paste">동물원에 넣기</button></div>
+  </div>
+</section>
+
+<!-- ============ 3. 기운 달력 ============ -->
+<section id="v-luck" class="hide">
+  <div class="card">
+    <h2 style="font-size:19px">오늘의 운세</h2>
+    <p class="small muted" style="margin:4px 0 0">해에도 달에도 날에도 동물이 있어요. 그 동물이 내 네 마리와 어떻게 만나는지가 그날의 기운입니다.</p>
+    <div id="luck-today" style="margin-top:14px"></div>
+  </div>
+  <div class="card">
+    <h3 style="font-size:16px">좋은 해</h3>
+    <div class="mrow" id="luck-years"></div>
+    <h3 style="font-size:16px;margin-top:12px">이 해의 달 <span class="tiny muted" style="font-weight:400">(절기 기준)</span></h3>
+    <div class="mrow" id="luck-months"></div>
+  </div>
+  <div class="card">
+    <div style="display:flex;align-items:center;gap:10px">
+      <button class="btn sm ghost" id="cal-prev" style="width:auto;padding:8px 14px">‹</button>
+      <h3 style="font-size:16px;flex:1;text-align:center" id="cal-title">—</h3>
+      <button class="btn sm ghost" id="cal-next" style="width:auto;padding:8px 14px">›</button>
+    </div>
+    <div class="cal" id="cal-grid"></div>
+    <div class="tiny muted center" style="margin-top:10px">진한 초록일수록 내 동물들과 잘 맞는 날 · 붉은 날은 부딪히기 쉬운 날</div>
+    <div id="cal-best" class="small" style="margin-top:12px"></div>
+  </div>
+</section>
+
+<!-- ============ 4. 초대 ============ -->
+<section id="v-invite" class="hide">
+  <div class="card">
+    <h2 style="font-size:19px">친구 초대하기</h2>
+    <p class="small muted" style="margin:6px 0 0"><b>친구가 자기 손으로 넣게 하는 게 좋아요.</b> 그래야 친구도 자기 네 마리를 만나고, 자기 동물원을 갖게 되거든요.</p>
+    <div class="loop">
+      <div class="lp"><span class="ln">1</span>링크를 카톡으로 보낸다</div>
+      <div class="lp"><span class="ln">2</span>친구가 생년월일을 넣는다 <span class="muted">— 설치·가입 없음</span></div>
+      <div class="lp"><span class="ln">3</span>친구가 <b>우리 둘의 궁합</b>을 바로 본다</div>
+      <div class="lp"><span class="ln">4</span>친구가 코드를 보내주면 내 동물원에 들어온다</div>
+    </div>
+    <div style="margin:14px 0 8px"><div class="copybox" id="inv-link"></div></div>
+    <button class="btn" id="btn-copy">링크 복사하기</button>
+    <div style="margin-top:8px"><button class="btn sm ghost" id="btn-openlink">친구에게 어떻게 보이는지 미리보기</button></div>
+    <div class="note" style="margin-top:14px">🔒 이 링크에 담기는 것은 <b>내 동물 네 마리 · 내 이름 · 내 동물원에 몇 명이 어떤 사이로 있는지</b>입니다.
+      친구는 그 사람들을 <b>가림 처리로만</b> 보고, <b>이름과 생년월일은 담기지 않습니다.</b><br>
+      서버를 거치지 않고, 친구가 넣은 생년월일도 <b>친구 폰에서만</b> 계산됩니다.</div>
+  </div>
+
+  <div class="card">
+    <h3 style="font-size:16px">친구가 코드를 보내줬다면</h3>
+    <p class="tiny muted" style="margin:6px 0 10px">친구가 궁합을 본 뒤 보내준 코드를 넣으면 동물원에 들어와요.</p>
+    <input class="inp" id="f-paste2" placeholder="ZOO-... 코드 붙여넣기">
+    <div style="margin-top:8px"><button class="btn sm ghost" id="btn-paste2">동물원에 넣기</button></div>
+  </div>
+
+  <div class="card">
+    <h3 style="font-size:16px">생년월일을 이미 알고 있다면</h3>
+    <p class="tiny muted" style="margin:6px 0 10px">가족처럼 이미 아는 생일은 직접 넣어도 됩니다. 다만 <b>친구에게는 링크를 보내는 쪽이 좋아요</b> — 친구도 자기 동물을 보게 되니까요.</p>
+    <button class="btn sm ghost" id="btn-addself">내가 직접 입력하기</button>
+  </div>
+</section>
+
+<!-- ============ 5. 궁합 결과 ============ -->
+<section id="v-match" class="hide">
+  <div class="card">
+    <div class="center small muted" id="mt-who">—</div>
+    <div class="seg" id="seg-rel">
+      <button data-r="가족">가족</button>
+      <button data-r="직장">직장</button>
+      <button data-r="친구" class="on">친구</button>
+      <button data-r="연인">연인</button>
+    </div>
+    <div class="scorebig">
+      <div class="n" id="mt-score">—<small>점</small></div>
+      <div class="lbl" id="mt-label">—</div>
+    </div>
+    <div class="bar"><i id="mt-bar"></i></div>
+    <p class="small" id="mt-desc" style="margin:12px 0 0"></p>
+  </div>
+
+  <div class="card">
+    <h3 style="font-size:16px">여덟 마리가 만났어요</h3>
+    <div id="mt-beasts" style="margin-top:10px"></div>
+  </div>
+
+  <div class="card">
+    <h3 style="font-size:16px">서로 채워주는 것 <span class="tiny muted" style="font-weight:400">오행</span></h3>
+    <div id="mt-oh" style="margin-top:8px"></div>
+  </div>
+
+  <div class="card">
+    <h3 style="font-size:16px">눈에 띄는 만남</h3>
+    <div id="mt-meets" style="margin-top:6px"></div>
+  </div>
+
+  <div class="card" id="mt-both">
+    <h3 style="font-size:16px">둘 다 기운 좋은 날</h3>
+    <div id="both-body" style="margin-top:8px"></div>
+  </div>
+
+  <div id="mt-hostzoo" class="card hide">
+    <h3 style="font-size:17px" id="hz-title">—</h3>
+    <p class="small muted" style="margin:5px 0 0" id="hz-sub">—</p>
+    <div id="hz-svg" style="margin-top:6px"></div>
+    <div id="hz-legend" class="legend"></div>
+    <div class="note" style="margin-top:12px">🔒 다른 분들은 <b>누구인지 안 보여요.</b> 이 링크에는 몇 명이 어떤 사이인지만 담겨 있고, 이름·생년월일은 담기지 않습니다.</div>
+    <div style="margin-top:12px"><button class="btn" id="btn-makemine">나도 내 동물원 만들기</button></div>
+  </div>
+
+  <div id="mt-guest" class="card hide">
+    <h3 style="font-size:16px">이 결과를 <span id="mt-host">친구</span>님 동물원에 보낼까요?</h3>
+    <p class="tiny muted" style="margin:6px 0 10px">아래 코드를 복사해서 카톡으로 보내주면 돼요. 자동으로 전송되는 건 없습니다.</p>
+    <div class="copybox" id="guest-code"></div>
+    <div style="margin-top:10px"><button class="btn sm" id="btn-copycode">코드 복사</button></div>
+    <div class="hr"></div>
+    <button class="btn ghost" id="btn-mine">나도 내 동물 네 마리 보기</button>
+  </div>
+</section>
+
+</div>
+
+<div class="nav" id="nav"><div class="wrap">
+  <button data-v="zoo" class="on"><span class="ic">🐾</span>내 동물</button>
+  <button data-v="map"><span class="ic">🫧</span>관계도</button>
+  <button data-v="luck"><span class="ic">🔮</span>운세</button>
+  <button data-v="invite"><span class="ic">🔗</span>초대</button>
+</div></div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+
+const D2R = Math.PI/180;
+const STEMS = ['갑','을','병','정','무','기','경','신','임','계'];
+const BRANCHES = ['자','축','인','묘','진','사','오','미','신','유','술','해'];
+
+const ANIMALS = [
+ {n:'쥐',    e:'🐭', o:'수', t:'빨리 알아채고 잘 모아둬요'},
+ {n:'소',    e:'🐮', o:'토', t:'느리지만 끝까지 해내요'},
+ {n:'호랑이',e:'🐯', o:'목', t:'무서워도 제일 먼저 나서요'},
+ {n:'토끼',  e:'🐰', o:'목', t:'누구랑도 잘 지내요'},
+ {n:'용',    e:'🐲', o:'토', t:'하고 싶은 게 크고 많아요'},
+ {n:'뱀',    e:'🐍', o:'화', t:'속마음을 잘 안 보여줘요'},
+ {n:'말',    e:'🐴', o:'화', t:'가만히 있는 걸 답답해해요'},
+ {n:'양',    e:'🐑', o:'토', t:'남의 기분을 잘 알아채요'},
+ {n:'원숭이',e:'🐵', o:'금', t:'방법을 기가 막히게 찾아내요'},
+ {n:'닭',    e:'🐔', o:'금', t:'꼼꼼하고 딱 맞아야 해요'},
+ {n:'개',    e:'🐶', o:'토', t:'내 편은 끝까지 지켜줘요'},
+ {n:'돼지',  e:'🐷', o:'수', t:'잘 나눠주고 사람을 잘 믿어요'},
+];
+
+const TIP = [
+ {food:['김밥','견과류','치즈'],        item:'작은 파우치',      color:'검정·남색'},  // 쥐 水
+ {food:['소고기국밥','곰탕','우유'],     item:'튼튼한 가죽 소품',  color:'노랑·베이지'},// 소 土
+ {food:['고기구이','든든한 한 상'],      item:'줄무늬 있는 것',    color:'초록'},      // 호랑이 木
+ {food:['비빔밥','샐러드','당근라페'],   item:'부드러운 천 소품',  color:'초록'},      // 토끼 木
+ {food:['회','초밥'],                  item:'반짝이는 액세서리', color:'노랑·베이지'},// 용 土
+ {food:['마라탕','매운 것'],            item:'가는 팔찌나 체인',  color:'빨강'},      // 뱀 火
+ {food:['국수','파스타','면 종류'],      item:'편한 신발',        color:'빨강'},      // 말 火
+ {food:['양꼬치','따뜻한 탕'],          item:'니트나 포근한 것',  color:'노랑·베이지'},// 양 土
+ {food:['과일','샌드위치'],             item:'멀티툴·다용도 물건',color:'흰색·은색'},  // 원숭이 金
+ {food:['치킨','삼계탕'],               item:'시계',             color:'흰색·은색'},  // 닭 金
+ {food:['백반','집밥'],                 item:'열쇠고리',          color:'노랑·베이지'},// 개 土
+ {food:['삼겹살','돈까스'],             item:'동전지갑',          color:'검정·남색'},  // 돼지 水
+];
+const YUKHAP_OF = b => (YUKHAP.find(p=>p.includes(b))||[]).find(x=>x!==b);
+
+const PILLAR_META = [
+  {k:'년', plain:'태어난 해',   title:'남들이 먼저 보는 동물',    sub:'처음 만난 사람한테 보이는 나예요'},
+  {k:'월', plain:'태어난 달',   title:'뭔가 해낼 때 나오는 동물', sub:'학교나 회사에서 일할 때의 나예요'},
+  {k:'일', plain:'태어난 날',   title:'진짜 나인 동물',           sub:'친한 사람만 아는, 편할 때의 나예요', hero:true},
+  {k:'시', plain:'태어난 시간', title:'나중에 나오는 동물',       sub:'지금은 잘 안 보이는데 나이 들수록 커져요'},
+];
+
+function hasJong(s){ const c=s.charCodeAt(s.length-1); if(c<0xAC00||c>0xD7A3)return false; return (c-0xAC00)%28!==0; }
+const 와과=s=>s+(hasJong(s)?'과':'와');
+const 은는=s=>s+(hasJong(s)?'은':'는');
+const josa=(s,withJong,without)=>hasJong(s)?withJong:without;   // josa('용','과','와') → '과'
+
+const nim=s=>{ s=(s||'').trim(); return /[님씨]$/.test(s)? s : s+'님'; };
+
+function jdn(y,m,d){
+  const a=Math.floor((14-m)/12), yy=y+4800-a, mm=m+12*a-3;
+  return d+Math.floor((153*mm+2)/5)+365*yy+Math.floor(yy/4)-Math.floor(yy/100)+Math.floor(yy/400)-32045;
+}
+function jdUT(y,m,d,hUT){ return jdn(y,m,d)-0.5+hUT/24; }
+function jdnToYMD(J){
+  let a=J+32044, b=Math.floor((4*a+3)/146097), c=a-Math.floor(146097*b/4);
+  let d=Math.floor((4*c+3)/1461), e=c-Math.floor(1461*d/4), m=Math.floor((5*e+2)/153);
+  return {y:100*b+d-4800+Math.floor(m/10), m:m+3-12*Math.floor(m/10), d:e-Math.floor((153*m+2)/5)+1};
+}
+
+function deltaT(y){
+  let t;
+  if(y<1920){ t=y-1900; return -2.79+1.494119*t-0.0598939*t*t+0.0061966*t**3-0.000197*t**4; }
+  if(y<1941){ t=y-1920; return 21.20+0.84493*t-0.076100*t*t+0.0020936*t**3; }
+  if(y<1961){ t=y-1950; return 29.07+0.407*t-t*t/233+t**3/2547; }
+  if(y<1986){ t=y-1975; return 45.45+1.067*t-t*t/260-t**3/718; }
+  if(y<2005){ t=y-2000; return 63.86+0.3345*t-0.060374*t*t+0.0017275*t**3+0.000651814*t**4+0.00002373599*t**5; }
+  t=y-2000; return 62.92+0.32217*t+0.005589*t*t;
+}
+const tdToUT=jde=>jde-deltaT(jdnToYMD(Math.floor(jde+0.5)).y)/86400;
+
+function sunLon(jd){
+  const T=(jd-2451545)/36525;
+  const L0=280.46646+36000.76983*T+0.0003032*T*T;
+  const M=(357.52911+35999.05029*T-0.0001537*T*T)*D2R;
+  const C=(1.914602-0.004817*T-0.000014*T*T)*Math.sin(M)+(0.019993-0.000101*T)*Math.sin(2*M)+0.000289*Math.sin(3*M);
+  const om=(125.04-1934.136*T)*D2R;
+  let lam=L0+C-0.00569-0.00478*Math.sin(om);
+  return ((lam%360)+360)%360;
+}
+function solveLon(target,guess){
+  let jd=guess;
+  for(let i=0;i<50;i++){
+    let df=sunLon(jd)-target;
+    while(df>180)df-=360; while(df<-180)df+=360;
+    if(Math.abs(df)<1e-8)break;
+    jd-=df/0.9856473;
+  }
+  return tdToUT(jd);
+}
+
+const JEOL=[
+ {n:'입춘',lon:315,br:2,gm:2},{n:'경칩',lon:345,br:3,gm:3},{n:'청명',lon:15,br:4,gm:4},
+ {n:'입하',lon:45,br:5,gm:5},{n:'망종',lon:75,br:6,gm:6},{n:'소서',lon:105,br:7,gm:7},
+ {n:'입추',lon:135,br:8,gm:8},{n:'백로',lon:165,br:9,gm:9},{n:'한로',lon:195,br:10,gm:10},
+ {n:'입동',lon:225,br:11,gm:11},{n:'대설',lon:255,br:0,gm:12},{n:'소한',lon:285,br:1,gm:1},
+];
+const _jeolCache={};
+function jeolOf(year){
+  if(_jeolCache[year])return _jeolCache[year];
+  const r=JEOL.map((j,i)=>({...j, jd: solveLon(j.lon, jdUT(i===11?year+1:year, j.gm, 5, 0)), yr: i===11?year+1:year}));
+  _jeolCache[year]=r; return r;
+}
+
+function newMoonJD(k){
+  const T=k/1236.85, T2=T*T, T3=T2*T, T4=T3*T;
+  let jde = 2451550.09766 + 29.530588861*k + 0.00015437*T2 - 0.000000150*T3 + 0.00000000073*T4;
+  const E = 1 - 0.002516*T - 0.0000074*T2;
+  const M  = (2.5534 + 29.10535670*k - 0.0000014*T2 - 0.00000011*T3)*D2R;
+  const Mp = (201.5643 + 385.81693528*k + 0.0107582*T2 + 0.00001238*T3 - 0.000000058*T4)*D2R;
+  const F  = (160.7108 + 390.67050284*k - 0.0016118*T2 - 0.00000227*T3 + 0.000000011*T4)*D2R;
+  const Om = (124.7746 - 1.56375588*k + 0.0020672*T2 + 0.00000215*T3)*D2R;
+  const s=Math.sin;
+  jde += -0.40720*s(Mp) + 0.17241*E*s(M) + 0.01608*s(2*Mp) + 0.01039*s(2*F)
+      +  0.00739*E*s(Mp-M) - 0.00514*E*s(Mp+M) + 0.00208*E*E*s(2*M)
+      -  0.00111*s(Mp-2*F) - 0.00057*s(Mp+2*F) + 0.00056*E*s(2*Mp+M)
+      -  0.00042*s(3*Mp) + 0.00042*E*s(M+2*F) + 0.00038*E*s(M-2*F)
+      -  0.00024*E*s(2*Mp-M) - 0.00017*s(Om) - 0.00007*s(Mp+2*M)
+      +  0.00004*s(2*Mp-2*F) + 0.00004*s(3*M) + 0.00003*s(Mp+M-2*F)
+      +  0.00003*s(2*Mp+2*F) - 0.00003*s(Mp+M+2*F) + 0.00003*s(Mp-M+2*F)
+      -  0.00002*s(Mp-M-2*F) - 0.00002*s(3*Mp+M) + 0.00002*s(4*Mp);
+  const A=[[299.77,0.107408,-0.009173,0.000325],[251.88,0.016321,0,0.000165],[251.83,26.651886,0,0.000164],
+           [349.42,36.412478,0,0.000126],[84.66,18.206239,0,0.000110],[141.74,53.303771,0,0.000062],
+           [207.14,2.453732,0,0.000060],[154.84,7.306860,0,0.000056],[34.52,27.261239,0,0.000047],
+           [207.19,0.121824,0,0.000042],[291.34,1.844379,0,0.000040],[161.72,24.198154,0,0.000037],
+           [239.56,25.513099,0,0.000035],[331.55,3.592518,0,0.000023]];
+  for(const [a0,a1,a2,amp] of A) jde += amp*s((a0+a1*k+a2*T2)*D2R);
+  return tdToUT(jde);
+}
+const KSTh=9/24;
+
+function nmDayNum(k){ return Math.floor(newMoonJD(k)+0.5+KSTh); }
+function monthStartJD(k){ return nmDayNum(k)-0.5-KSTh; }
+function lastNewMoonK(jd){
+  let k=Math.floor((jd-2451550.09766)/29.530588861)+2;
+  while(monthStartJD(k)>jd) k--;
+  return k;
+}
+function hasZhongqi(k){                       // 중기(황경 30의 배수)를 품는 달인가
+  const s=monthStartJD(k), e=monthStartJD(k+1);
+  const target=(Math.ceil(sunLon(s)/30-1e-9)*30)%360;
+  const t=solveLon(target, s+15);
+  return t>=s-1e-6 && t<e;
+}
+function spanFor(y){                          // y년 동지를 품은 달(=11월)부터 한 바퀴
+  const k0=lastNewMoonK(solveLon(270, jdUT(y,12,21,0)));
+  const k1=lastNewMoonK(solveLon(270, jdUT(y+1,12,21,0)));
+  const n=k1-k0, months=[];
+  let leapAt=-1;
+  if(n===13){ for(let i=1;i<n;i++){ if(!hasZhongqi(k0+i)){ leapAt=i; break; } } if(leapAt<0)leapAt=n-1; }
+  let label=11;
+  for(let i=0;i<n;i++){
+    if(i===leapAt) months.push({k:k0+i, m:((label-2+12)%12)+1, leap:true, start:nmDayNum(k0+i)});
+    else { months.push({k:k0+i, m:label, leap:false, start:nmDayNum(k0+i)}); label=label%12+1; }
+  }
+  return months;
+}
+const _lyCache={};
+function lunarYear(y){
+  if(_lyCache[y])return _lyCache[y];
+  const a=spanFor(y-1), b=spanFor(y), res=[];
+  let seen=false;
+  for(const mo of a){ if(mo.m===1&&!mo.leap)seen=true; if(seen)res.push(mo); }
+  for(const mo of b){ if(mo.m===11||mo.m===12)res.push(mo); else break; }
+  _lyCache[y]=res; return res;
+}
+function lunarMonthInfo(Y,M,leap){
+  const ms=lunarYear(Y);
+  const i=ms.findIndex(x=>x.m===M && !!x.leap===!!leap);
+  if(i<0) return null;
+  const mo=ms[i], next=ms[i+1];
+  const len=(next?next.start:nmDayNum(mo.k+1))-mo.start;
+  // 삭이 한국 자정에서 얼마나 떨어져 있나 — 90분 안이면 만세력끼리 갈릴 수 있다
+  const nm=newMoonJD(mo.k), frac=(nm+0.5+KSTh)-Math.floor(nm+0.5+KSTh);
+  const minsFromMidnight=Math.min(frac,1-frac)*1440;
+  return {...mo, len, minsFromMidnight};
+}
+function hasLeapMonth(Y,M){ return lunarYear(Y).some(x=>x.m===M&&x.leap); }
+function lunarToSolar(Y,M,D,leap){
+  const info=lunarMonthInfo(Y,M,leap);
+  if(!info) return {err: leap?`${Y}년에는 윤${M}월이 없어요`:`${Y}년 ${M}월을 못 찾았어요`};
+  if(D<1||D>info.len) return {err:`음력 ${Y}년 ${leap?'윤':''}${M}월은 ${info.len}일까지예요`};
+  const p=jdnToYMD(info.start+(D-1));
+  return {ymd:`${p.y}-${String(p.m).padStart(2,'0')}-${String(p.d).padStart(2,'0')}`, info};
+}
+
+function kstInfo(y,m,d){
+  const t=y*10000+m*100+d;
+  let std = 9;
+  if(t<19080401) std=8.4652;              // 그 이전은 지방시로 간주
+  else if(t<19120101) std=8.5;
+  else if(t<19540321) std=9;
+  else if(t<19610810) std=8.5;
+  const DST=[[19480601,19480912],[19490403,19490910],[19500401,19500909],[19510506,19510908],
+             [19550505,19550908],[19560520,19560929],[19570505,19570921],[19580504,19580920],
+             [19590503,19590919],[19600501,19600917],[19870510,19871011],[19880508,19881009]];
+  const dst = DST.some(([a,b])=>t>=a&&t<=b);
+  return {std, dst, off: std + (dst?1:0)};
+}
+const SEOUL_LON = 126.978;
+
+function computeSaju(dateStr, timeStr, useTrueSolar){
+  const [Y,M,D] = dateStr.split('-').map(Number);
+  const hasTime = !!timeStr;
+  const [hh,mi] = hasTime ? timeStr.split(':').map(Number) : [12,0];
+  const clock = hh + mi/60;
+  const tz = kstInfo(Y,M,D);
+  const off = tz.off;
+  const jdMoment = jdUT(Y,M,D, clock - off);              // 절대 시각(JD)
+  // 기준 지방시: 진태양시 보정 켜면 서울 경도, 끄면 표준시 그대로
+  const localHours = useTrueSolar ? (SEOUL_LON/15) : off;
+  const localJD = jdMoment + localHours/24;               // 이 값의 정수부 경계가 지방 자정
+  const localDayNum = Math.floor(localJD + 0.5);          // 지방시 기준 '그 날'의 JDN
+  const localHourOfDay = (localJD + 0.5 - localDayNum) * 24;
+
+  // 년주 (입춘 경계)
+  const jeolThis = jeolOf(Y);
+  const ipchunThis = jeolThis[0].jd;
+  const sajuYear = (jdMoment >= ipchunThis) ? Y : Y-1;
+  const yIdx = ((sajuYear-4)%60+60)%60;
+  const yStem = yIdx%10, yBr = yIdx%12;
+
+  // 월주 (12절 경계)
+  let list = [...jeolOf(sajuYear)];
+  let cur = list[0];
+  for(const j of list) if(jdMoment >= j.jd) cur = j;
+  const mBr = cur.br;
+  // 인월의 천간 = (년간%5)*2+2
+  const inStem = ((yStem%5)*2+2)%10;
+  const stepsFromIn = ((mBr - 2)%12+12)%12;
+  const mStem = (inStem + stepsFromIn)%10;
+
+  // 일주
+  const dIdx = ((localDayNum + 49)%60+60)%60;
+  const dStem = dIdx%10, dBr = dIdx%12;
+
+  // 시주
+  let hStem=null, hBr=null;
+  if(hasTime){
+    hBr = Math.floor(((localHourOfDay+1)%24)/2)%12;
+    hStem = ((dStem%5)*2 + hBr)%10;
+  }
+
+  // 절기 경계 경고
+  let warn=[];
+  const nearJeol = list.find(j=>Math.abs(j.jd-jdMoment)<0.05);
+  if(nearJeol) warn.push(`${nearJeol.n} 경계에서 2시간 이내에 태어나셨어요. 만세력마다 월주가 달라질 수 있습니다.`);
+  if(Math.abs(jdMoment-ipchunThis)<1) warn.push('입춘 전후 하루 안에 태어나셨어요. 띠(년주)가 갈리는 자리입니다.');
+  if(hasTime && tz.dst) warn.push(`이 날은 <b>서머타임</b> 기간이었어요. 시계가 한 시간 앞당겨져 있던 때라 그만큼 되돌려 계산했습니다.`);
+  if(hasTime && tz.std!==9) warn.push(`이 시기 한국 표준시는 UTC+${tz.std===8.5?'8:30':tz.std}이었습니다. 시주 계산에 반영했어요.`);
+
+  return {
+    date:dateStr, time: hasTime?timeStr:null, trueSolar:useTrueSolar,
+    stems:[yStem,mStem,dStem,hStem], branches:[yBr,mBr,dBr,hBr],
+    hasTime, sajuYear, jeolName:cur.n, warn,
+    dayIdx:dIdx, localDayNum
+  };
+}
+function ganjiStr(s,b){ return (s===null||b===null)?'??':STEMS[s]+BRANCHES[b]; }
+
+function hourBlocks(dateStr, useTrueSolar){
+  const [Y,M,D]=dateStr.split('-').map(Number);
+  const tz=kstInfo(Y,M,D);
+  const localHours = useTrueSolar ? (SEOUL_LON/15) : tz.off;
+  const runs=[];
+  for(let m=0;m<1440;m++){
+    const jdM=jdUT(Y,M,D, m/60 - tz.off);
+    const localJD=jdM+localHours/24;
+    const dayNum=Math.floor(localJD+0.5);
+    const hod=(localJD+0.5-dayNum)*24;
+    const br=Math.floor(((hod+1)%24)/2)%12;
+    const last=runs[runs.length-1];
+    if(!last||last.br!==br) runs.push({br,from:m,to:m});
+    else last.to=m;
+  }
+  const hhmm=m=>`${String(Math.floor(m/60)).padStart(2,'0')}:${String(m%60).padStart(2,'0')}`;
+  return runs.map((r,i)=>{
+    // 자시는 자정을 걸쳐 하루에 두 조각으로 나온다. 끊긴 끝을 '자정'이라고 정직하게 쓴다
+    const head = r.from===0, tail = r.to===1439;
+    const label = head ? `자정~${hhmm(r.to+1)}` : tail ? `${hhmm(r.from)}~자정` : `${hhmm(r.from)}~${hhmm(r.to+1)}`;
+    return {...r, mid:Math.floor((r.from+r.to)/2), label, split: head||tail};
+  });
+}
+function blockOfMinute(blocks,m){ return blocks.find(b=>m>=b.from&&m<=b.to); }
+
+const SAMHAP=[[8,0,4],[11,3,7],[2,6,10],[5,9,1]];
+const SAMHAP_NAME=['물의 무리','나무의 무리','불의 무리','쇠의 무리'];
+const YUKHAP=[[0,1],[2,11],[3,10],[4,9],[5,8],[6,7]];
+const PA=[[0,9],[1,4],[2,11],[3,6],[5,8],[7,10]];
+const HAE=[[0,7],[1,6],[2,5],[3,4],[8,11],[9,10]];
+const HYUNG3=[[2,5,8],[1,10,7]];
+const JAHYUNG=[4,6,9,11];
+const has2=(arr,a,b)=>arr.some(p=>(p[0]===a&&p[1]===b)||(p[0]===b&&p[1]===a));
+const inTrio=(trios,a,b)=>trios.findIndex(t=>t.includes(a)&&t.includes(b)&&a!==b);
+
+function branchRel(a,b){
+  if(a===b){
+    if(JAHYUNG.includes(a)) return {k:'자형',s:-6,t:'같은 동물끼리 스스로를 조이는 자리'};
+    return {k:'쌍둥이',s:4,t:'같은 동물 — 말 안 해도 아는 대신 같은 약점도 나눠 가져요'};
+  }
+  if(((a-b)%12+12)%12===6) return {k:'충',s:-12,t:'열두 자리에서 정반대에 서 있어요. 세게 부딪히고 세게 흔들어요'};
+  const si=inTrio(SAMHAP,a,b);
+  if(si>=0) return {k:'삼합의 짝',s:12,t:`둘 다 ${SAMHAP_NAME[si]}예요. 목적이 같아서 팀이 되기 쉬워요`, trio:si};
+  if(has2(YUKHAP,a,b)) return {k:'짝꿍',s:11,t:'둘이 붙어 다니는 짝(육합). 곁에 있으면 편해요'};
+  if(HYUNG3.some(t=>t.includes(a)&&t.includes(b))) return {k:'형',s:-8,t:'짧게는 괜찮은데 오래 두면 서로 걸려요'};
+  if(a===0&&b===3||a===3&&b===0) return {k:'형',s:-8,t:'예의가 어긋나기 쉬운 자리(자묘형)'};
+  if(has2(HAE,a,b)) return {k:'해',s:-6,t:'크게 싸우진 않는데 서운함이 쌓여요'};
+  if(has2(PA,a,b)) return {k:'파',s:-5,t:'잘 가다가 한 번씩 툭 깨져요'};
+  return {k:'무난',s:0,t:'특별히 얽히지 않아요. 서로의 영역이 따로 있어요'};
+}
+const STEM_HAP=[[0,5],[1,6],[2,7],[3,8],[4,9]];
+const STEM_CHUNG=[[0,6],[1,7],[2,8],[3,9]];
+
+const ELEMENTS=['목','화','토','금','수'];
+const STEM_O=['목','목','화','화','토','토','금','금','수','수'];   // 갑을 병정 무기 경신 임계
+const EL={
+  목:{e:'🌱',c:'#7FB069',t:'자라고 뻗는 기운', p:'새로 시작하고 밀고 나가는 힘'},
+  화:{e:'🔥',c:'#E07A5F',t:'밝히고 퍼지는 기운', p:'표현하고 앞에 나서는 힘'},
+  토:{e:'🪨',c:'#C9A227',t:'품고 버티는 기운', p:'참고 지키고 이어가는 힘'},
+  금:{e:'⚔️',c:'#94A3B8',t:'자르고 다듬는 기운', p:'정리하고 결정하는 힘'},
+  수:{e:'💧',c:'#5B8DBE',t:'흐르고 스미는 기운', p:'생각하고 맞춰가는 힘'},
+};
+function ohaeng(saju){
+  const c={목:0,화:0,토:0,금:0,수:0};
+  saju.stems.forEach(s=>{ if(s!==null)c[STEM_O[s]]++; });
+  saju.branches.forEach(b=>{ if(b!==null)c[ANIMALS[b].o]++; });
+  return c;
+}
+
+const SAENG=['목','화','토','금','수'];               // 목생화생토생금생수생목
+const GEUK={목:'토',토:'수',수:'화',화:'금',금:'목'};  // 내가 이기는 것
+const ROLE_INFO={
+  비겁:{t:'같은 편', d:'형제·친구처럼 나와 같은 힘'},
+  인성:{t:'나를 키우는 것', d:'엄마·도움·배움'},
+  식상:{t:'내가 쏟아내는 것', d:'표현·재주·만들어내는 일'},
+  재성:{t:'내가 다루는 것', d:'돈·현실·챙겨야 할 것'},
+  관성:{t:'나를 누르는 것', d:'규율·상사·책임'},
+};
+function tenGodRole(myEl,e){
+  const i=SAENG.indexOf(myEl);
+  if(e===myEl) return '비겁';
+  if(e===SAENG[(i+4)%5]) return '인성';
+  if(e===SAENG[(i+1)%5]) return '식상';
+  if(e===GEUK[myEl]) return '재성';
+  return '관성';
+}
+function strength(saju){
+  const myEl=STEM_O[saju.stems[2]];
+  const W_STEM=[1,1,0,1];        // 일간 자신은 세지 않는다 — 그게 '나'다
+  const W_BR=[1,2.5,1.5,1];      // 년 · 월(계절이라 가장 크다) · 일 · 시
+  let ally=0, drain=0;
+  const roles={비겁:0,인성:0,식상:0,재성:0,관성:0};
+  saju.stems.forEach((s,i)=>{ if(s===null||!W_STEM[i])return;
+    const r=tenGodRole(myEl,STEM_O[s]); roles[r]+=W_STEM[i];
+    (r==='비겁'||r==='인성') ? ally+=W_STEM[i] : drain+=W_STEM[i]; });
+  saju.branches.forEach((b,i)=>{ if(b===null)return;
+    const r=tenGodRole(myEl,ANIMALS[b].o); roles[r]+=W_BR[i];
+    (r==='비겁'||r==='인성') ? ally+=W_BR[i] : drain+=W_BR[i]; });
+  const ratio=(ally+drain)?ally/(ally+drain):.4;
+  
+  const kind = ratio>=0.50?'신강' : ratio<=0.28?'신약' : '중화';
+  const i=SAENG.indexOf(myEl);
+  const map={비겁:myEl, 인성:SAENG[(i+4)%5], 식상:SAENG[(i+1)%5], 재성:GEUK[myEl],
+             관성:Object.keys(GEUK).find(k=>GEUK[k]===myEl)};
+  // 신강이면 빼주는 것이, 신약이면 채워주는 것이 도움이 된다
+  const good = kind==='신강' ? [map.식상,map.재성,map.관성] : kind==='신약' ? [map.비겁,map.인성] : [];
+  const bad  = kind==='신강' ? [map.비겁,map.인성] : kind==='신약' ? [map.식상,map.재성,map.관성] : [];
+  return {myEl, kind, ratio, ally:+ally.toFixed(1), drain:+drain.toFixed(1), roles, map, good, bad};
+}
+
+function ohaengFit(sa,sb){
+  const A=ohaeng(sa), B=ohaeng(sb);
+  const SA=strength(sa), SB=strength(sb);
+  const side=(st,mine,theirs)=>{
+    let s=0; const helps=[], burdens=[], empty=[];
+    if(st.kind==='중화'){
+      // 치우침이 없으면 '없는 걸 채워주는가'로 본다
+      for(const e of ELEMENTS){
+        if(mine[e]===0){
+          if(theirs[e]>=2){ s+=6; helps.push(e); }
+          else if(theirs[e]===1){ s+=3; helps.push(e); }
+          else { s-=4; empty.push(e); }
+        }
+      }
+    }else{
+      st.good.forEach(e=>{ const n=Math.min(theirs[e],3); if(n){ s+=n*2.2; if(n>=2)helps.push(e); } });
+      st.bad .forEach(e=>{ const n=Math.min(theirs[e],3); if(n){ s-=n*1.3; if(n>=2)burdens.push(e); } });
+    }
+    return {s,helps,burdens,empty};
+  };
+  const a=side(SA,A,B), b=side(SB,B,A);
+  const floods=[];
+  for(const e of ELEMENTS){
+    if((A[e]>=4&&B[e]>=3)||(B[e]>=4&&A[e]>=3)) floods.push(e);
+  }
+  return {s:(a.s+b.s)/2 - floods.length*1.5, a, b, SA, SB, A, B, floods};
+}
+
+function confidenceOf(sa,sb){
+  const n=(sa.branches[3]===null?3:4)+(sb.branches[3]===null?3:4);   // 6~8
+  return 0.72 + 0.14*(n-6);
+}
+
+const REL_W={
+  '연인':{same:[0.8,1.0,3.2,0.7],cross:0.18,hap:8,chung:-6,hyungMul:1.0,chungMul:1.30},
+  // 가족: 뿌리와 환경을 공유하는 사이 → 년지·월지. 일지는 낮게 둔다
+  '가족':{same:[2.2,2.0,0.9,1.0],cross:0.25,hap:5,chung:-3,hyungMul:1.50,chungMul:0.60},
+  // 직장: 월지(일하는 방식·직책)가 중심. 일지는 낮다 — 사적인 나를 안 보이는 사이다
+  '직장':{same:[0.8,2.8,0.9,1.6],cross:0.25,hap:4,chung:-5,hyungMul:1.20,chungMul:1.10},
+  // 친구: 일지(가까운 나)가 중심. 뿌리보다 지금의 결이 맞아야 한다
+  '친구':{same:[1.4,0.9,2.4,1.0],cross:0.25,hap:6,chung:-4,hyungMul:0.90,chungMul:0.95},
+};
+const CATS=['가족','직장','친구','연인'];
+const CAT_COLOR={'가족':'var(--fam)','직장':'var(--wrk)','친구':'var(--acq)','연인':'var(--lov)'};
+const migrateCat=c=>c==='지인'?'친구':(CATS.includes(c)?c:'친구');   // 옛 '지인' 데이터 이관
+
+function calibrate(s){
+  const v = 50 + (s-54)*(s>=54 ? 2.1 : 1.5);
+  return Math.max(8, Math.min(97, Math.round(v)));
+}
+function compat(a,b,type){
+  const W=REL_W[migrateCat(type)]||REL_W['친구'];
+  let raw=0, totW=0, meets=[];
+  for(let i=0;i<4;i++){
+    if(a.branches[i]===null)continue;
+    for(let j=0;j<4;j++){
+      if(b.branches[j]===null)continue;
+      const w=(i===j)?W.same[i]:W.cross;
+      const r=branchRel(a.branches[i],b.branches[j]);
+      let s=r.s;
+      if(r.k==='충')s*=W.chungMul;
+      if(r.k==='형'||r.k==='자형')s*=W.hyungMul;
+      raw+=s*w; totW+=w;
+      meets.push({i,j,w,r,eff:s*w,ab:a.branches[i],bb:b.branches[j]});
+    }
+  }
+  const avg = totW? raw/totW : 0;
+  // 천간(일간) — 끌림과 충돌
+  let stemTerm=0, stemNote=null;
+  const as=a.stems[2], bs=b.stems[2];
+  if(has2(STEM_HAP,as,bs)){ stemTerm=W.hap; stemNote={k:'천간합',t:`${STEMS[as]}과 ${STEMS[bs]} — 서로 끌리는 기운이 있어요`}; }
+  else if(has2(STEM_CHUNG,as,bs)){ stemTerm=W.chung; stemNote={k:'천간충',t:`${STEMS[as]}과 ${STEMS[bs]} — 생각하는 방향이 정면으로 달라요`}; }
+  // 삼합 완성 (둘의 지지를 합쳐 세 마리가 다 모이면)
+  const allBr=[...a.branches,...b.branches].filter(x=>x!==null);
+  let trioBonus=0, trios=[];
+  SAMHAP.forEach((t,ti)=>{
+    if(t.every(x=>allBr.includes(x))){
+      const fromA=t.some(x=>a.branches.includes(x)), fromB=t.some(x=>b.branches.includes(x));
+      if(fromA&&fromB){ trioBonus+=4; trios.push(ti); }
+    }
+  });
+  const oh = ohaengFit(a,b);
+  const conf = confidenceOf(a,b);
+  // 오행은 절대 가산점이 아니라 '평균보다 잘 채워주는가'로 쓴다.
+  // 그냥 더하면 68%가 빈 오행을 갖고 있어 점수 전체가 밀려 올라간다(평균 54.9→59.5, 최고 등급 12%).
+  // OH_BASE는 무작위 쌍의 실측 평균이다. 오행 로직을 바꿀 때마다 다시 재야 한다 (2026-08-14)
+  const OH_BASE = 2.88;
+  const stretched = calibrate(50 + avg*3.4 + stemTerm + trioBonus + (oh.s-OH_BASE)*0.9);
+  const score = Math.round(50 + (stretched-50)*conf);    // 아는 게 적으면 중앙으로
+  meets.sort((x,y)=>Math.abs(y.eff)-Math.abs(x.eff));
+  return {score, meets, stemNote, trios, avg, oh, conf};
+}
+const GRADES=[
+ {min:85,l:'서로를 키우는 사이', d:'같이 있으면 각자 혼자일 때보다 커집니다. 다만 너무 잘 맞아서 서로에게만 갇히기 쉬워요.'},
+ {min:70,l:'잘 맞물리는 사이', d:'서로의 빈 곳을 자연스럽게 메웁니다. 힘들 때 먼저 떠오르는 쪽이에요.'},
+ {min:55,l:'무난히 걷는 사이', d:'크게 부딪히지도, 크게 붙지도 않아요. 오래 가는 관계는 대개 여기 있습니다.'},
+ {min:45,l:'서로 다른 속도로 걷는 사이', d:'같은 곳을 봐도 걷는 속도가 달라요. 속도를 맞추려 하기보다 만나는 지점을 정해두는 쪽이 편합니다.'},
+ {min:22,l:'부딪히며 배우는 사이', d:'가까워질수록 마찰이 납니다. 그 마찰이 서로에게 없는 걸 알려주기도 해요. 거리를 정해두면 훨씬 낫습니다.'},
+ {min:0, l:'많이 다른 사이', d:'사는 방식이 서로 많이 달라요. 상대를 이해하려 애쓰기보다 다르다는 걸 인정하고 각자의 자리를 두는 편이 서로에게 좋습니다.'},
+];
+function gradeOf(s){ return GRADES.find(g=>s>=g.min); }
+
+function lowNote(score,type){
+  if(score>=45) return '';
+  if(type==='연인') return '일지가 정면으로 마주 선 조합일 때 이렇게 나와요. 사주에서 가장 많이 이야기되는 자리인데, <b>오래 가는 커플도 여기 많습니다</b> — 부딪히는 지점이 뻔해서 미리 정해둘 수 있거든요.';
+  if(type==='가족') return '가족은 고를 수 없죠. 이 숫자는 <b>맞고 틀리고가 아니라 결이 다르다</b>는 뜻이에요. 자주 붙어 있기보다 각자의 리듬을 인정할 때 편해지는 사이입니다.';
+  if(type==='직장') return '일하는 방식이 서로 많이 달라요. <b>사람이 문제가 아니라 속도와 순서가 다른 것</b>일 때가 많습니다. 말로 맞추려 하기보다 문서나 메시지로 남기면 훨씬 덜 부딪혀요.';
+  return '사적으로 가까워질수록 어긋나는 쪽이에요. 오히려 <b>가끔 보는 사이일 때 편한</b> 조합입니다. 거리만 정하면 됩니다.';
+}
+function scoreColor(s){
+  if(s>=70) return '#5FA86E';
+  if(s>=55) return '#8FBF7F';
+  if(s>=45) return '#C9A227';
+  if(s>=30) return '#E09A6A';
+  return '#D9705F';
+}
+
+function luckScore(me, br, st){
+  const W=[1.0,1.3,2.0,0.9];
+  let raw=0,tot=0,best=null;
+  for(let i=0;i<4;i++){
+    if(me.branches[i]===null)continue;
+    const r=branchRel(me.branches[i],br);
+    raw+=r.s*W[i]; tot+=W[i];
+    if(!best||Math.abs(r.s)>Math.abs(best.r.s)) best={i,r};
+  }
+  const avg=tot?raw/tot:0;
+  let stemTerm=0, stemNote=null;
+  if(st!==undefined && st!==null){
+    const my=me.stems[2];
+    if(has2(STEM_HAP,my,st)){ stemTerm=6; stemNote={k:'천간합',t:`${STEMS[my]}과 ${STEMS[st]}이 손을 잡는 날`}; }
+    else if(has2(STEM_CHUNG,my,st)){ stemTerm=-5; stemNote={k:'천간충',t:`${STEMS[my]}과 ${STEMS[st]}이 부딪히는 날`}; }
+    else if(my===st){ stemTerm=2; stemNote={k:'같은 천간',t:'나와 같은 기운이 도는 날'}; }
+  }
+  return {score:Math.max(5,Math.min(98,Math.round(50+avg*3.6+stemTerm))), best, stemNote};
+}
+
+const PAY_ENABLED = false;
+const FREE_LIMIT  = 3;            // 무료로 볼 수 있는 친구 수
+const PRICE_ONE   = 990;
+const PRICE_ALL   = 9900;
+let purchase={unlimited:false, slots:0, spent:0};
+let WAITLIST=null;                 // 결제가 열리기 전, 살 마음이 있는 사람을 세는 자리
+const isPro=()=>purchase.unlimited;
+
+const PRO_FEATURES=[
+  {k:'friends', n:'친구 수',            free:`${FREE_LIMIT}명까지`, pro:'무제한'},
+  {k:'match',   n:'궁합 점수·해설·오행', free:'전부 보여요',        pro:'전부 보여요'},
+  {k:'rel',     n:'같은 사람을 다른 사이로 보기', free:'등록한 사이 하나', pro:'가족·직장·친구·연인 전부'},
+  {k:'both',    n:'둘 다 기운 좋은 날',  free:'—',                  pro:'✓'},
+  {k:'cal',     n:'기운 달력',          free:'이번 달',            pro:'지난 달·다음 달 자유롭게'},
+  {k:'cloud',   n:'계정에 저장·복원',    free:'✓',                  pro:'✓'},
+];
+function capacity(){ return purchase.unlimited ? Infinity : FREE_LIMIT + purchase.slots; }
+function remainFree(){ return Math.max(0, capacity()-FRIENDS.length); }
+function upgradeCost(){ return Math.max(0, PRICE_ALL - purchase.spent); }
+
+const MEM={};
+const store={
+  get(k){ try{ return localStorage.getItem(k); }catch(e){ return k in MEM?MEM[k]:null; } },
+  set(k,v){ try{ localStorage.setItem(k,v); }catch(e){ MEM[k]=v; } },
+  get persistent(){ try{ localStorage.setItem('__t','1'); localStorage.removeItem('__t'); return true; }catch(e){ return false; } }
+};
+const LS='zoo_v1';
+let ME=null, FRIENDS=[], GUEST=null, HOST=null, curRel='친구', curCat='all', calOffset=0, ACCOUNT=null;
+let PREVIEW_BACKUP=null, ADDING_FRIEND=false, PAY_PROMPT=null;
+
+function askPro(reason){
+  PAY_PROMPT=reason; renderMap(); show('map');
+  $('paywall').scrollIntoView({behavior:'smooth',block:'center'});
+}
+function saveLocal(){ store.set(LS,JSON.stringify({me:ME,friends:FRIENDS,purchase,account:ACCOUNT})); }
+function save(){ saveLocal(); cloudPush(); }
+function load(){ try{ const d=JSON.parse(store.get(LS)||'null');
+  if(d){ME=d.me;FRIENDS=d.friends||[];purchase=d.purchase||purchase;ACCOUNT=d.account||null;} }catch(e){}
+  try{ WAITLIST=JSON.parse(store.get('zoo_waitlist')||'null'); }catch(e){} }
+
+const CLOUD='zoo_cloud_v1';
+function cloudKey(){ return ACCOUNT? CLOUD+':'+ACCOUNT.id : null; }
+function cloudPush(){
+  const k=cloudKey(); if(!k)return;
+  store.set(k, JSON.stringify({me:ME,friends:FRIENDS,purchase,at:Date.now()}));
+}
+function cloudPull(id){
+  try{ return JSON.parse(store.get(CLOUD+':'+id)||"null"); }catch(e){ return null; }
+}
+function cloudAt(){ const k=cloudKey(); if(!k)return null;
+  try{ return JSON.parse(store.get(k)||"null")?.at||null; }catch(e){ return null; } }
+function agoText(ts){
+  if(!ts)return '아직 저장 전';
+  const s=Math.floor((Date.now()-ts)/1000);
+  if(s<60)return '방금 전'; if(s<3600)return Math.floor(s/60)+'분 전';
+  if(s<86400)return Math.floor(s/3600)+'시간 전'; return Math.floor(s/86400)+'일 전';
+}
+
+const b64e=s=>btoa(String.fromCharCode(...new TextEncoder().encode(s))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+const b64d=s=>new TextDecoder().decode(Uint8Array.from(atob(s.replace(/-/g,'+').replace(/_/g,'/')),c=>c.charCodeAt(0)));
+
+function packPerson(p, withZoo){
+  const o={n:p.name,s:p.saju.stems,b:p.saju.branches,c:p.cat||null};
+  if(withZoo) o.z=FRIENDS.map(f=>migrateCat(f.cat));
+  return b64e(JSON.stringify(o));
+}
+function unpackPerson(code){
+  const o=JSON.parse(b64d(code));
+  return {name:o.n, cat:o.c, zoo:o.z||null, saju:{stems:o.s,branches:o.b,hasTime:o.b[3]!==null,warn:[]}};
+}
+
+const $=id=>document.getElementById(id);
+const VIEWS=['input','zoo','map','luck','invite','match'];
+function show(v){
+  VIEWS.forEach(x=>$('v-'+x).classList.toggle('hide',x!==v));
+  document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('on',b.dataset.v===v));
+  $('nav').classList.toggle('hide', v==='input'||(v==='match'&&!ME));
+  window.scrollTo(0,0);
+}
+function toast(m){ const t=$('toast'); t.textContent=m; t.classList.add('on'); clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove('on'),1600); }
+
+function beastCard(saju,i,opt={}){
+  const b=saju.branches[i], meta=PILLAR_META[i];
+  if(b===null) return `<div class="beast empty${meta.hero?' hero':''}">
+      <span class="face">❔</span><div class="who">${meta.title}</div>
+      <div class="nm">아직 안 나타났어요</div>
+      <div class="tr">태어난 시간을 넣으면 네 번째 동물이 나타나요</div></div>`;
+  const a=ANIMALS[b];
+  return `<div class="beast${meta.hero?' hero':''}">
+      ${meta.hero?'<div class="badge">진짜 나</div>':''}
+      <span class="face">${a.e}</span>
+      <div class="who">${meta.title}</div>
+      <div class="nm">${a.n}</div>
+      <div class="tr">${a.t}</div></div>`;
+}
+
+function renderZoo(){
+  if(!ME)return;
+  $('zoo-title').textContent = `${nim(ME.name)}의 네 마리`;
+  const s=ME.saju;
+  const L=s.lunar;
+  // 시간대로 고른 분에게 "07:30"이라고 쓰지 않는다 — 고른 건 시각이 아니라 시간대다
+  const timeTxt = !s.time ? '(시간 모름)'
+    : s.timeMode==='block' ? `${ANIMALS[s.branches[3]].e}${ANIMALS[s.branches[3]].n}의 시간` : s.time;
+  $('zoo-sub').innerHTML = (L? `음력 ${L.Y}.${L.leap?'윤':''}${L.M}.${L.D} <span style="opacity:.6">→ 양력 ${s.date}</span>` : s.date)
+    + ` ${timeTxt} · ${s.sajuYear}년 ${s.jeolName}절`;
+  $('zoo-grid').innerHTML = beastCard(s,2)+beastCard(s,0)+beastCard(s,1)+beastCard(s,3);
+  $('pillar-explain').innerHTML = PILLAR_META.map((m,i)=>{
+    const b=s.branches[i];
+    const a=b===null?null:ANIMALS[b];
+    return `<div style="display:flex;gap:10px;padding:9px 0;border-top:1px dashed var(--line)">
+      <div style="font-size:24px;width:32px;text-align:center">${a?a.e:'❔'}</div>
+      <div style="flex:1"><b>${m.plain}의 동물 — ${a?a.n:'아직 없어요'}</b><br>
+      <span class="muted tiny">${m.title} · ${m.sub}</span></div></div>`;
+  }).join('');
+  // 오행 — 무엇이 넘치고 무엇이 없나
+  const c=ohaeng(s), max=Math.max(...ELEMENTS.map(e=>c[e]));
+  const none=ELEMENTS.filter(e=>c[e]===0), most=ELEMENTS.filter(e=>c[e]===max);
+  
+  const maxN=Math.max(1,...ELEMENTS.map(e=>c[e])), BAR=58;
+  $('my-oh').innerHTML=`<div style="display:flex;gap:6px;align-items:flex-end;height:${BAR+22}px">${ELEMENTS.map(e=>{
+      const n=c[e], info=EL[e];
+      const h=n?Math.max(9,Math.round(n/maxN*BAR)):4;
+      return `<div style="flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center">
+        <div style="font-size:11px;font-weight:800;line-height:1;margin-bottom:4px;color:${n?info.c:'var(--sub)'}">${n}</div>
+        <div style="width:100%;height:${h}px;background:${n?info.c:'#EDE4D4'};border-radius:5px;opacity:${n?1:.45}"></div></div>`;
+    }).join('')}</div>
+    <div style="display:flex;gap:6px;margin-top:5px">${ELEMENTS.map(e=>{
+      const n=c[e], info=EL[e];
+      return `<div style="flex:1;text-align:center;font-size:11px;line-height:1.3;font-weight:${n?700:400};color:${n?'var(--ink)':'var(--sub)'}">${info.e}<br>${e}</div>`;
+    }).join('')}</div>
+    <div class="hr" style="margin:14px 0 10px"></div>
+    <p class="small" style="margin:0">
+      ${most.map(e=>`<b>${EL[e].e}${e}</b>`).join('·')}${josa(most[most.length-1],'이','가')} 가장 많아요 — ${most.map(e=>EL[e].p).join(' / ')}이 강한 편이에요.
+      ${none.length?`<br><br>대신 <b>${none.map(e=>EL[e].e+e).join('·')}</b>${josa(none[none.length-1],'이','가')} 하나도 없어요.
+        ${none.map(e=>EL[e].p).join(' / ')}은 혼자 애쓰기보다 <b>그 기운을 가진 사람 곁에 있을 때</b> 훨씬 잘 됩니다.
+        궁합에서 그걸 채워주는 사람이 나와요.`:'<br><br>다섯 기운이 고르게 있어요. 어디에도 크게 치우치지 않는 편입니다.'}
+    </p>`;
+  // 신강·신약 + 십성
+  const st=strength(s), pct=Math.round(st.ratio*100);
+  const KIND_TXT={
+    신강:{h:'내 편이 많은 <b>신강</b>이에요', d:'힘이 넉넉한 편이라 <b>쓰고 쏟아낼 때</b> 풀립니다. 가만히 더 모으면 오히려 답답해져요.'},
+    신약:{h:'내 편이 적은 <b>신약</b>이에요', d:'혼자 다 짊어지기보다 <b>도와주는 사람·배우는 자리</b>에서 훨씬 잘 됩니다. 약하다는 뜻이 아니라 <b>같이 할 때 세진다</b>는 뜻이에요.'},
+    중화:{h:'어느 쪽으로도 치우치지 않은 <b>중화</b>예요', d:'내 편과 나를 쓰는 것이 엇비슷해요. 상황에 따라 맞춰가는 편이 잘 맞습니다.'},
+  }[st.kind];
+  $('my-str').innerHTML=`
+    <!-- ⚠️ 라벨을 막대 안에 넣으면 한쪽이 0일 때 글자가 밖으로 밀려난다 (2026-08-14). 밖에 둔다 -->
+    <div style="display:flex;height:14px;border-radius:7px;overflow:hidden;background:#EDE4D4">
+      <div style="width:${pct}%;background:#7FB069"></div>
+      <div style="width:${100-pct}%;background:#C48A72"></div>
+    </div>
+    <div style="display:flex;justify-content:space-between;margin-top:6px;font-size:11.5px;font-weight:800">
+      <span style="color:#7FB069">내 편 ${st.ally}</span>
+      <span style="color:#C48A72">나를 쓰는 것 ${st.drain}</span>
+    </div>
+    <p class="small" style="margin:11px 0 0">${KIND_TXT.h} — ${KIND_TXT.d}</p>
+    <div class="hr" style="margin:12px 0 10px"></div>
+    <div style="display:grid;gap:5px">${Object.entries(st.roles).sort((a,b)=>b[1]-a[1]).map(([r,v])=>`
+      <div style="display:flex;align-items:center;gap:9px;font-size:12.5px">
+        <span style="width:34px;font-weight:800;color:${['비겁','인성'].includes(r)?'#7FB069':'#C48A72'}">${r}</span>
+        <span style="flex:1;color:var(--sub)">${ROLE_INFO[r].t} · ${ROLE_INFO[r].d}</span>
+        <span style="font-weight:800;color:${EL[st.map[r]].c}">${EL[st.map[r]].e}${st.map[r]} ${v}</span>
+      </div>`).join('')}</div>
+    <div class="disc">신강·신약 판정은 파(派)마다 기준이 갈립니다. 월지(계절)를 얼마나 크게 볼지, 지장간까지 셀지가 다르고, 경계에 있는 사주는 전문가끼리도 답이 다릅니다. <b>참고만 해주세요.</b></div>`;
+  $('raw-pillars').innerHTML = ['년주','월주','일주','시주'].map((k,i)=>
+    `${k} ${ganjiStr(s.stems[i],s.branches[i])}`).join(' &nbsp;·&nbsp; ');
+  if(s.warn&&s.warn.length){ $('raw-warn').classList.remove('hide'); $('raw-warn').innerHTML='⚠️ '+s.warn.join('<br>⚠️ '); }
+  else $('raw-warn').classList.add('hide');
+}
+
+function renderAccount(){
+  if(ACCOUNT){
+    $('acct-body').innerHTML=`<div class="acctrow">
+      <div class="av">☁️</div>
+      <div style="flex:1"><div style="font-weight:700;font-size:14px">${nim(ACCOUNT.name)}의 계정에 저장 중
+        ${isPro()?'<span class="tagpill" style="background:linear-gradient(135deg,#F0885A,#E8899E);margin-left:4px">프로</span>':''}</div>
+      <div class="tiny muted">마지막 저장 ${agoText(cloudAt())} · 폰을 바꿔도 로그인하면 그대로 있어요</div></div>
+      <button class="tiny muted" id="btn-logout" style="text-decoration:underline;white-space:nowrap">로그아웃</button></div>
+      <div class="row" style="margin-top:11px">
+        <button class="btn sm ghost" id="btn-newdevice">새 폰인 척 해보기</button>
+        <button class="btn sm ghost" id="btn-restore">계정에서 불러오기</button>
+      </div>
+      <p class="tiny muted" style="margin:8px 0 0">「새 폰인 척」을 누르면 이 기기의 기록을 지웁니다. 그다음 「불러오기」로 계정에서 되찾아지는지 확인해 보세요.</p>`;
+    $('btn-logout').addEventListener('click',()=>{ACCOUNT=null;save();renderAll();toast('로그아웃했어요');});
+    $('btn-newdevice').addEventListener('click',()=>{
+      const acc=ACCOUNT;                       // 계정은 남기고 기기 데이터만 비운다
+      ME=null; FRIENDS=[]; purchase={unlimited:false,slots:0,spent:0}; ACCOUNT=acc;
+      saveLocal();      // ⚠️ save()를 쓰면 빈 상태가 계정에도 덮어써진다
+      renderAll(); show('map'); toast('기기 기록을 비웠어요 — 이제 불러와 보세요');
+    });
+    $('btn-restore').addEventListener('click',()=>{
+      const d=cloudPull(ACCOUNT.id);
+      if(!d||!d.me){ toast('계정에 저장된 게 없어요'); return; }
+      ME=d.me; FRIENDS=d.friends||[]; purchase=d.purchase||purchase;
+      saveLocal();
+      renderAll(); show('map');
+      toast(`${nim(ME.name)}의 동물원을 되찾았어요 · 친구 ${FRIENDS.length}명${isPro()?' · 프로':''}`);
+    });
+  }else{
+    $('acct-body').innerHTML=`<div style="font-weight:700;font-size:14px;margin-bottom:3px">지금은 이 브라우저에만 저장돼요</div>
+      <p class="tiny muted" style="margin:0 0 10px">폰을 바꾸거나 방문 기록을 지우면 동물원이 사라집니다. 계정에 저장해두면 다른 기기에서도 불러올 수 있어요.</p>
+      <button class="kakao" id="btn-login">카카오 계정으로 저장하기</button>
+      <p class="tiny muted" style="margin:8px 0 0"><b>카카오톡과 연결되는 게 아니에요.</b> 새 비밀번호를 만들지 않으려고 카카오 계정을 로그인 수단으로만 빌려 씁니다 — 친구 목록·메시지는 가져오지 않고, 받는 건 닉네임뿐이에요.</p>`;
+    $('btn-login').addEventListener('click',()=>{
+      // 실제로는 카카오가 돌려주는 고유 id를 쓴다. 목업은 이름으로 계정을 가른다
+      ACCOUNT={id:'kakao_'+(ME?ME.name:'me'), name:ME?ME.name:'나', at:new Date().toISOString()};
+      save(); renderAll(); toast('계정에 저장됐어요 ☁️ (목업 — 실제 카카오 로그인 아님)');
+    });
+  }
+}
+
+let planOpen=false;
+function renderPlan(){
+  const pro=isPro();
+  $('plan-badge').innerHTML = pro
+    ? '<span class="tagpill" style="background:linear-gradient(135deg,#F0885A,#E8899E)">프로 이용 중</span>'
+    : '<span class="tagpill" style="background:#C9BFAE">지금은 기본</span>';
+  $('plan-arrow').textContent = planOpen?'▴':'▾';
+  $('plan-body').classList.toggle('hide',!planOpen);
+  if(!planOpen)return;
+  $('plan-body').innerHTML=`
+    <table class="cmp"><thead><tr><th></th>
+      <th${pro?'':' style="color:var(--ink)"'}>기본</th><th class="pro">프로</th></tr></thead><tbody>
+      ${PRO_FEATURES.map(f=>`<tr><td>${f.n}</td><td>${f.free}</td><td class="pro">${f.pro}</td></tr>`).join('')}
+    </tbody></table>
+    ${pro
+      ? `<p class="tiny muted" style="margin:10px 0 0">프로를 쓰고 계세요. 전부 열려 있습니다 🐾</p>`
+      : `<p class="tiny muted" style="margin:10px 0 0">기본으로도 <b>내 동물 네 마리·오행·신강신약·친구 3명 궁합은 전부</b> 보실 수 있어요.
+         프로는 <b>더 넓게, 더 여러 각도로</b> 보는 자리입니다.</p>
+         <div style="margin-top:10px"><button class="btn sm ghost" id="btn-plan-go">프로 열어보기</button></div>`}`;
+  $('btn-plan-go')&&$('btn-plan-go').addEventListener('click',()=>askPro('프로에서 열리는 기능이에요'));
+}
+$('btn-plan').addEventListener('click',()=>{ planOpen=!planOpen; renderPlan(); });
+
+function renderPaywall(){
+  const box=$('paywall'), chip=$('cap-chip');
+  // 남은 자리 칩
+  if(purchase.unlimited){ chip.className='capchip pro'; chip.textContent='무제한'; }
+  else{
+    const left=remainFree();
+    chip.className='capchip'+(left===0?' full':'');
+    chip.textContent = left===0 ? `자리 다 찼어요 (${FRIENDS.length}/${capacity()})` : `${FRIENDS.length}/${capacity()}명`;
+  }
+  // 아직 자리가 남으면 결제 화면을 안 띄운다 — 쓰기도 전에 돈 얘기부터 하지 않는다.
+  // 다만 프로 기능을 눌렀을 땐(PAY_PROMPT) 자리가 남아도 보여준다
+  if(purchase.unlimited || (remainFree()>0 && !PAY_PROMPT)){ box.classList.add('hide'); return; }
+  box.classList.remove('hide');
+  const paid=purchase.spent>0;
+  const full=remainFree()===0;
+  box.innerHTML=`<div class="paywall">
+    <h4>${full?'네 번째 친구부터는 자리를 늘려야 해요':(PAY_PROMPT||'프로에서 열리는 기능이에요')}</h4>
+    <p class="small muted" style="margin:6px 0 2px">${full
+      ?`지금까지 ${FRIENDS.length}명의 궁합을 보셨어요. 이미 본 친구들은 그대로 남습니다.`
+      :'지금 보시던 건 그대로 두고, 아래에서 열 수 있어요.'}</p>
+    <table class="cmp"><thead><tr><th></th><th>기본</th><th class="pro">프로</th></tr></thead><tbody>
+      ${PRO_FEATURES.map(f=>`<tr><td>${f.n}</td><td>${f.free}</td><td class="pro">${f.pro}</td></tr>`).join('')}
+    </tbody></table>
+    <button class="plan" id="buy-one" ${PAY_ENABLED?'':'disabled'}>
+      <span class="pt"><span class="pn">한 명 더 보기</span><br><span class="pd">친구 한 명 자리가 늘어나요</span></span>
+      <span class="pp">${PRICE_ONE.toLocaleString()}원</span></button>
+    <button class="plan best" id="buy-all" ${PAY_ENABLED?'':'disabled'}>
+      <span class="pt"><span class="pn">무제한으로 열기</span><br><span class="pd">몇 명이든 추가 · <b>둘 다 기운 좋은 날</b> 달력까지</span></span>
+      <span class="pp">${upgradeCost().toLocaleString()}원</span></button>
+    ${paid?`<p class="tiny" style="margin:9px 0 0;color:var(--pt)">지금까지 ${purchase.spent.toLocaleString()}원 쓰셨어요. ${upgradeCost().toLocaleString()}원만 더 내면 무제한이 됩니다.</p>`:''}
+    ${PAY_ENABLED?'':`
+      <div style="margin-top:12px">
+        <button class="btn ${WAITLIST?'ghost':''}" id="btn-waitlist" ${WAITLIST?'disabled':''}>
+          ${WAITLIST?'✓ 열리면 알려드릴게요':'프로가 열리면 알려주세요'}</button>
+        <p class="tiny muted" style="margin:8px 0 0">${WAITLIST
+          ?'준비되면 계정으로 알려드릴게요. 그때까지는 기본으로 계속 쓰실 수 있어요.'
+          :'아직 결제를 열지 않았어요. 미리 눌러두시면 열릴 때 알려드릴게요.'}</p>
+      </div>
+      <div class="note" style="margin-top:11px">🔧 <b>여기는 목업이에요.</b> 아래로 프로를 미리 둘러볼 수 있습니다.
+      <div class="row" style="margin-top:9px">
+        <button class="btn sm ghost" id="mock-one">990원 산 셈</button>
+        <button class="btn sm ghost" id="mock-all">9,900원 산 셈</button>
+      </div></div>`}
+  </div>`;
+  const buyOne=()=>{purchase.slots++;purchase.spent+=PRICE_ONE;
+    if(purchase.spent>=PRICE_ALL){purchase.unlimited=true;} PAY_PROMPT=null; save();renderAll();toast('자리가 하나 늘었어요');};
+  const buyAll=()=>{purchase.spent+=upgradeCost();purchase.unlimited=true;PAY_PROMPT=null;save();renderAll();toast('프로가 됐어요 🐾 이제 전부 열려요');};
+  ['buy-one','mock-one'].forEach(id=>$(id)&&$(id).addEventListener('click',buyOne));
+  ['buy-all','mock-all'].forEach(id=>$(id)&&$(id).addEventListener('click',buyAll));
+  
+  $('btn-waitlist')&&$('btn-waitlist').addEventListener('click',()=>{
+    WAITLIST={at:Date.now(), from:PAY_PROMPT||'자리 다 참', friends:FRIENDS.length};
+    store.set('zoo_waitlist',JSON.stringify(WAITLIST));
+    renderPaywall(); toast('열리면 알려드릴게요 🐾');
+  });
+}
+
+function renderMap(){
+  if(!ME)return;
+  renderAccount(); renderPlan(); renderPaywall();
+  const list = FRIENDS.filter(f=>curCat==='all'||f.cat===curCat);
+  $('map-sub').textContent = FRIENDS.length? `${FRIENDS.length}명이 함께 있어요` : '아직 아무도 없어요. 링크를 보내보세요';
+  
+  const S=380,C=S/2,R=118,NR=21;
+  let lines='',nodes='';
+  const halo=`stroke="var(--bg)" stroke-width="3.5" paint-order="stroke" stroke-linejoin="round"`;
+  list.forEach((f,i)=>{
+    const ang=(-90+ i*(360/Math.max(list.length,1)))*D2R;
+    const dx=Math.cos(ang), dy=Math.sin(ang);
+    const x=C+R*dx, y=C+R*dy;
+    const r=compat(ME.saju,f.saju,f.cat);
+    const col=scoreColor(r.score);
+    const wdt=1.2+Math.abs(r.score-50)/13;
+    // ② 중심 원(32) 밖에서 시작해 친구 원(21) 앞에서 끝난다.
+    //    아래로 가는 선은 내 이름표(C+41~C+57)를 지나므로 그 바깥에서 시작한다 — 선이 끊겨 보이지 않게
+    //    ...단, 정말로 이름표를 관통하는 선만. 조건을 넓게 잡으면 아래쪽 선이 죄다 짧아져 위와 어긋난다
+    const nameHalfW = ME.name.length*6+15;
+    const crossesLabel = dy > 0.05 && Math.abs(41*dx/dy) < nameHalfW;
+    const startR = crossesLabel ? 62 : 38;
+    lines+=`<line x1="${(C+startR*dx).toFixed(1)}" y1="${(C+startR*dy).toFixed(1)}"
+      x2="${(C+(R-NR-3)*dx).toFixed(1)}" y2="${(C+(R-NR-3)*dy).toFixed(1)}"
+      stroke="${col}" stroke-width="${wdt.toFixed(1)}" stroke-linecap="round" opacity=".7"/>`;
+    const an=ANIMALS[f.saju.branches[2]];
+    // ① 라벨은 바깥쪽으로. 아래쪽 친구는 원 밑, 위쪽 친구는 원 위에 붙는다
+    const up = dy < -0.25;
+    const ly = up ? y-NR-16 : y+NR+16;
+    nodes+=`<g><circle cx="${x}" cy="${y}" r="${NR}" fill="#fff" stroke="${CAT_COLOR[migrateCat(f.cat)]}" stroke-width="2.5"/>
+      <text x="${x}" y="${y+7}" text-anchor="middle" font-size="20">${an.e}</text>
+      <text x="${x}" y="${ly}" text-anchor="middle" font-size="11" fill="#3A3128" font-weight="700" ${halo}>${f.name}</text>
+      <text x="${x}" y="${ly+14}" text-anchor="middle" font-size="10.5" fill="${col}" font-weight="800" ${halo}>${r.score}</text></g>`;
+  });
+  const me=ANIMALS[ME.saju.branches[2]];
+  $('map-svg').innerHTML=`<svg viewBox="0 0 ${S} ${S}" style="width:100%;height:auto;display:block">
+    ${lines}
+    <circle cx="${C}" cy="${C}" r="34" fill="var(--bg)" stroke="none"/>
+    <circle cx="${C}" cy="${C}" r="32" fill="#FFF3E7" stroke="#F0885A" stroke-width="3"/>
+    <text x="${C}" y="${C+11}" text-anchor="middle" font-size="31">${me.e}</text>
+    <rect x="${C-(ME.name.length*6+11)}" y="${C+41}" width="${ME.name.length*12+22}" height="16" rx="8" fill="var(--bg)"/>
+    <text x="${C}" y="${C+52}" text-anchor="middle" font-size="11.5" fill="#3A3128" font-weight="800">${ME.name}</text>
+    ${nodes}</svg>`;
+  $('map-list').innerHTML = list.length? list.map(f=>{
+    const r=compat(ME.saju,f.saju,f.cat), a=ANIMALS[f.saju.branches[2]], g=gradeOf(r.score);
+    return `<div class="fitem" data-nm="${encodeURIComponent(f.name)}" style="cursor:pointer">
+      <div class="fav" style="border-color:${CAT_COLOR[migrateCat(f.cat)]}">${a.e}</div>
+      <div><div class="nmm">${f.name} <span class="tagpill" style="background:${CAT_COLOR[migrateCat(f.cat)]}">${migrateCat(f.cat)}</span></div>
+      <div class="sub">${g.l}</div></div>
+      <div class="sc" style="color:${scoreColor(r.score)}">${r.score}</div></div>`;
+  }).join('') : `<div class="tiny muted center" style="padding:18px 0">초대 탭에서 링크를 복사해 친구에게 보내보세요 🔗</div>`;
+  $('map-list').querySelectorAll('.fitem').forEach(el=>el.addEventListener('click',()=>{
+    const nm=decodeURIComponent(el.dataset.nm);
+    const f=FRIENDS.find(x=>x.name===nm); if(!f)return;
+    window.__viewFriend=f; curRel=migrateCat(f.cat);
+    document.querySelectorAll('#seg-rel button').forEach(x=>x.classList.toggle('on',x.dataset.r===curRel));
+    renderMatch(); show('match');
+  }));
+}
+
+function dayGanjiIdx(y,m,d){ return ((jdn(y,m,d)+49)%60+60)%60; }
+function renderLuck(){
+  if(!ME)return;
+  const now=new Date();
+  // 오늘
+  const ti=dayGanjiIdx(now.getFullYear(),now.getMonth()+1,now.getDate());
+  const tb=ti%12, tl=luckScore(ME.saju,tb,ti%10), ta=ANIMALS[tb];
+  const rel=tl.best?branchRel(ME.saju.branches[tl.best.i],tb):null;
+  
+  let tgt, why;
+  if(tl.score>=58){ tgt=tb; why=`오늘은 기운이 도는 날이에요. <b>${ta.n}</b>${josa(ta.n,'을','를')} 가까이 두면 더 좋습니다.`; }
+  else if(tl.score<=45){ tgt=YUKHAP_OF(tb); why=`오늘 ${ta.n}${josa(ta.n,'과','와')}는 조금 어긋나요. <b>${ANIMALS[tgt].n}</b>${josa(ANIMALS[tgt].n,'은','는')} ${ta.n}의 짝꿍(육합)이라 그 사이를 눌러줍니다.`; }
+  else { tgt=ME.saju.branches[2]; why=`특별할 것 없는 날이에요. <b>${nim(ME.name)}과 가장 가까운 ${ANIMALS[tgt].n}</b>으로 갑니다.`; }
+  const tip=TIP[tgt], ga=ANIMALS[tgt];
+  $('luck-today').innerHTML=`
+    <div style="display:flex;align-items:center;gap:14px">
+      <div style="font-size:44px">${ta.e}</div>
+      <div style="flex:1">
+        <div style="font-weight:800;font-size:16px">오늘은 ${STEMS[ti%10]}${BRANCHES[tb]} · ${ta.n}날 <span style="color:${scoreColor(tl.score)}">${tl.score}점</span></div>
+        <div class="small muted">${rel? `${nim(ME.name)}의 ${ANIMALS[ME.saju.branches[tl.best.i]].e}${와과(ANIMALS[ME.saju.branches[tl.best.i]].n)} <b>${rel.k}</b> — ${rel.t}` : ''}</div>
+      </div></div>
+    <div class="hr"></div>
+    <div class="small" style="margin-bottom:11px">${why}</div>
+    <div class="tips">
+      <div class="tip"><div class="te">🍚</div><div><div class="tl">오늘 점심</div><div class="tv">${tip.food.join(' · ')}</div></div></div>
+      <div class="tip"><div class="te">${ga.e}</div><div><div class="tl">데리고 다닐 것</div><div class="tv">${ga.n} 키링 · ${tip.item}</div></div></div>
+      <div class="tip"><div class="te">🎨</div><div><div class="tl">오늘의 색</div><div class="tv">${tip.color}</div></div></div>
+    </div>
+    <div id="today-people"></div>`;
+  renderTodayPeople(tb);
+  // 해
+  const yEl=[];
+  for(let k=-1;k<=4;k++){
+    const yy=now.getFullYear()+k, idx=((yy-4)%60+60)%60, br=idx%12, a=ANIMALS[br], l=luckScore(ME.saju,br,idx%10);
+    yEl.push(`<div class="mchip" style="${k===0?'border-color:var(--pt);border-width:2px':''}">
+      <div class="mn">${yy}</div><div class="me">${a.e}</div><div class="ms" style="color:${scoreColor(l.score)}">${l.score}</div></div>`);
+  }
+  $('luck-years').innerHTML=yEl.join('');
+  // 달 (절기 기준)
+  const js=jeolOf(now.getFullYear());
+  $('luck-months').innerHTML=js.map(j=>{
+    const a=ANIMALS[j.br], l=luckScore(ME.saju,j.br);
+    return `<div class="mchip"><div class="mn">${j.n}</div><div class="me">${a.e}</div>
+      <div class="ms" style="color:${scoreColor(l.score)}">${l.score}</div></div>`;
+  }).join('');
+  // 달력
+  const base=new Date(now.getFullYear(),now.getMonth()+calOffset,1);
+  const Y=base.getFullYear(),M=base.getMonth()+1;
+  $('cal-title').textContent=`${Y}년 ${M}월`;
+  // 잠긴 건 눌러보기 전에 보이게 한다
+  const lockCal=!isPro();
+  ['cal-prev','cal-next'].forEach(id=>{ $(id).style.opacity=lockCal?.45:1;
+    $(id).innerHTML=(id==='cal-prev'?'‹':'›')+(lockCal?'<span style="font-size:10px"> 🔒</span>':''); });
+  const first=new Date(Y,M-1,1).getDay(), last=new Date(Y,M,0).getDate();
+  let html=['일','월','화','수','목','금','토'].map(d=>`<div class="dow">${d}</div>`).join('');
+  for(let i=0;i<first;i++)html+='<div class="cell blank"></div>';
+  const scored=[];
+  for(let d=1;d<=last;d++){
+    const gi=dayGanjiIdx(Y,M,d), br=gi%12, a=ANIMALS[br], l=luckScore(ME.saju,br,gi%10);
+    scored.push({d,score:l.score,a});
+    const isToday=(Y===now.getFullYear()&&M===now.getMonth()+1&&d===now.getDate());
+    const alpha=Math.min(.85,Math.abs(l.score-50)/34);
+    const bg = l.score>=55? `rgba(95,168,110,${alpha})` : l.score<=45? `rgba(217,112,95,${alpha})` : 'rgba(0,0,0,.03)';
+    html+=`<div class="cell${isToday?' today':''}" style="background:${bg}">
+      <div class="a">${a.e}</div><div class="d">${d}</div></div>`;
+  }
+  $('cal-grid').innerHTML=html;
+  const best=[...scored].sort((x,y)=>y.score-x.score).slice(0,3);
+  const worst=[...scored].sort((x,y)=>x.score-y.score).slice(0,2);
+  $('cal-best').innerHTML=`<b>기운 좋은 날</b> ${best.map(b=>`${M}/${b.d} ${b.a.e}`).join(' · ')}<br>
+    <span class="muted">조심할 날</span> ${worst.map(b=>`${M}/${b.d} ${b.a.e}`).join(' · ')}`;
+}
+
+const DAY_ADVICE={
+  good:{'직장':'부탁하거나 보고할 게 있으면 오늘이에요.','가족':'오늘 연락 한 번 드리면 잘 받아주실 거예요.',
+        '연인':'오늘은 같이 있으면 편한 날이에요.','친구':'오늘 약속 잡기 좋아요.'},
+  hard:{'직장':'말이 어긋나기 쉬운 날이에요. 중요한 얘기는 메시지로 남겨두면 덜 부딪혀요.',
+        '가족':'서로 예민하기 쉬운 날이에요. 긴 얘기는 다른 날에 하는 게 좋겠어요.',
+        '연인':'사소한 걸로 부딪히기 쉬운 날이에요. 큰 결정은 미루는 쪽이 낫습니다.',
+        '친구':'오늘은 서로 말이 잘 안 닿을 수 있어요.'}
+};
+function renderTodayPeople(tb){
+  const box=$('today-people'); if(!box)return;
+  if(!FRIENDS.length){ box.innerHTML=`<div class="tiny muted center" style="padding:14px 0 2px">친구를 추가하면 오늘 누구와 잘 맞는지도 알려드려요</div>`; return; }
+  const rows=FRIENDS.map(f=>{
+    const r=branchRel(tb, f.saju.branches[2]);
+    return {f, r, good:r.s>=10, hard:r.s<=-6};
+  }).filter(x=>x.good||x.hard).sort((a,b)=>b.r.s-a.r.s);
+  if(!rows.length){ box.innerHTML=`<div class="tiny muted center" style="padding:14px 0 2px">오늘은 특별히 얽히는 사람이 없어요</div>`; return; }
+  box.innerHTML=`<div class="hr"></div><div style="font-weight:800;font-size:14px;margin-bottom:6px">오늘의 사람들</div>`
+    + rows.map(({f,r,good})=>{
+      const a=ANIMALS[f.saju.branches[2]], cat=migrateCat(f.cat);
+      return `<div class="meet"><div class="pair" style="font-size:20px">${good?'🌱':'🌀'}</div>
+        <div class="txt"><div class="t1">${f.name} <span class="tagpill" style="background:${CAT_COLOR[cat]}">${cat}</span> — ${a.n}</div>
+        <div class="t2">${(good?DAY_ADVICE.good:DAY_ADVICE.hard)[cat]}<br>
+        <span style="opacity:.7">오늘 ${ANIMALS[tb].n}${josa(ANIMALS[tb].n,'과','와')} ${a.n}${josa(a.n,'은','는')} <b>${r.k}</b></span></div></div></div>`;
+    }).join('');
+}
+
+function renderHostZoo(r){
+  const box=$('mt-hostzoo');
+  if(!GUEST || !HOST){ box.classList.add('hide'); return; }
+  box.classList.remove('hide');
+  const zoo=HOST.zoo||[];
+  const n=zoo.length;
+  $('hz-title').textContent=`${HOST.name}의 동물원`;
+  $('hz-sub').innerHTML = n
+    ? `이미 <b>${n}명</b>이 함께 있어요. ${nim(GUEST.name)}이 들어가면 <b>${n+1}명</b>이 됩니다.`
+    : `아직 아무도 없어요. ${nim(GUEST.name)}이 <b>첫 번째</b>가 됩니다.`;
+  const S=300,C=S/2,R=100,NR=19;
+  const all=[{me:true,cat:migrateCat(GUEST.cat||curRel)}, ...zoo.map(c=>({me:false,cat:c}))];
+  let lines='',nodes='';
+  all.forEach((it,i)=>{
+    const ang=(-90+i*(360/all.length))*D2R, dx=Math.cos(ang), dy=Math.sin(ang);
+    const x=C+R*dx, y=C+R*dy, col=it.me?scoreColor(r.score):'#D6CCBA';
+    lines+=`<line x1="${(C+32*dx).toFixed(1)}" y1="${(C+32*dy).toFixed(1)}"
+      x2="${(C+(R-NR-3)*dx).toFixed(1)}" y2="${(C+(R-NR-3)*dy).toFixed(1)}"
+      stroke="${col}" stroke-width="${it.me?3.2:1.6}" stroke-linecap="round" opacity="${it.me?.85:.4}"/>`;
+    if(it.me){
+      const a=ANIMALS[GUEST.saju.branches[2]];
+      const up=dy<-0.25, ly=up?y-NR-15:y+NR+15;
+      nodes+=`<g><circle cx="${x}" cy="${y}" r="${NR}" fill="#fff" stroke="${CAT_COLOR[it.cat]}" stroke-width="2.5"/>
+        <text x="${x}" y="${y+6}" text-anchor="middle" font-size="18">${a.e}</text>
+        <text x="${x}" y="${ly}" text-anchor="middle" font-size="10.5" font-weight="800" fill="#3A3128"
+          stroke="var(--card)" stroke-width="3.5" paint-order="stroke">${GUEST.name}</text>
+        <text x="${x}" y="${ly+13}" text-anchor="middle" font-size="10.5" font-weight="800" fill="${col}"
+          stroke="var(--card)" stroke-width="3.5" paint-order="stroke">${r.score}</text></g>`;
+    }else{
+      nodes+=`<g opacity=".75"><circle cx="${x}" cy="${y}" r="${NR}" fill="#F7F2E8" stroke="${CAT_COLOR[it.cat]}" stroke-width="2" stroke-dasharray="3 3"/>
+        <text x="${x}" y="${y+6}" text-anchor="middle" font-size="17" filter="url(#blurmask)">🐾</text>
+        <text x="${x}" y="${y+NR+14}" text-anchor="middle" font-size="10" fill="#B4A896" font-weight="700">${it.cat}</text></g>`;
+    }
+  });
+  const ha=ANIMALS[HOST.saju.branches[2]];
+  $('hz-svg').innerHTML=`<svg viewBox="0 0 ${S} ${S}" style="width:100%;height:auto;display:block">
+    <defs><filter id="blurmask"><feGaussianBlur stdDeviation="2.6"/></filter></defs>
+    ${lines}
+    <circle cx="${C}" cy="${C}" r="29" fill="#FFF3E7" stroke="#F0885A" stroke-width="2.5"/>
+    <text x="${C}" y="${C+10}" text-anchor="middle" font-size="27">${ha.e}</text>
+    <rect x="${C-(HOST.name.length*6+11)}" y="${C+36}" width="${HOST.name.length*12+22}" height="15" rx="7.5" fill="var(--card)"/>
+    <text x="${C}" y="${C+47}" text-anchor="middle" font-size="11" fill="#3A3128" font-weight="800">${HOST.name}</text>
+    ${nodes}</svg>`;
+  const used=[...new Set(all.map(a=>a.cat))];
+  $('hz-legend').innerHTML=used.map(c=>`<span><i style="background:${CAT_COLOR[c]}"></i>${c}</span>`).join('');
+}
+
+function renderMatch(){
+  const A = GUEST? GUEST : ME;      // 지금 이 화면을 보는 사람
+  const B = GUEST? HOST : (window.__viewFriend||null);
+  if(!A||!B)return;
+  const r=compat(A.saju,B.saju,curRel), g=gradeOf(r.score), col=scoreColor(r.score);
+  $('mt-who').innerHTML=`<b>${A.name}</b> 🤝 <b>${B.name}</b>`;
+  // 프로 아니면 등록한 사이 말고는 잠긴 것으로 보이게
+  document.querySelectorAll('#seg-rel button').forEach(x=>{
+    const locked = !isPro() && !GUEST && window.__viewFriend && x.dataset.r!==migrateCat(window.__viewFriend.cat);
+    x.style.opacity = locked?.5:1;
+    x.textContent = x.dataset.r + (locked?' 🔒':'');
+  });
+  $('mt-score').innerHTML=`${r.score}<small>점</small>`;
+  $('mt-score').style.color=col;
+  $('mt-label').textContent=g.l;
+  $('mt-bar').style.width=r.score+'%';
+  $('mt-bar').style.background=col;
+  let desc=g.d;
+  const ln=lowNote(r.score,curRel); if(ln) desc+=`<br><br>${ln}`;
+  // ⚠️ 예전엔 "흔치 않습니다"라고 썼는데 실제로 재보니 32.7%였다. 사실이 아닌 말은 쓰지 않는다 (2026-08-14)
+  if(r.trios.length) desc+=` 그리고 두 사람의 동물을 합치면 <b>${r.trios.map(t=>SAMHAP_NAME[t]).join('·')}</b>가 셋 다 모여요. 같은 방향을 보는 동물이 셋이면 그 기운이 세집니다.`;
+  if(r.stemNote) desc+=`<br><br><b>${r.stemNote.k}</b> — ${r.stemNote.t}`;
+  if(r.conf<1){
+    const who=[A.saju.branches[3]===null?A.name:null, B.saju.branches[3]===null?B.name:null].filter(Boolean);
+    desc+=`<br><br>🕓 ${who.join('·')}님의 <b>태어난 시간을 몰라서</b> 동물이 세 마리예요.
+      아는 게 적으면 점수도 그만큼 조심스럽게 냅니다 — <b>실제로는 더 높거나 더 낮을 수 있어요.</b>
+      시간을 알아내면 훨씬 또렷해집니다.`;
+  }
+  $('mt-desc').innerHTML=desc;
+  // 여덟 마리
+  $('mt-beasts').innerHTML=`<div style="display:flex;gap:6px;align-items:center;justify-content:center;flex-wrap:wrap">
+    <div style="text-align:center"><div style="font-size:30px;letter-spacing:-3px">${A.saju.branches.filter(x=>x!==null).map(b=>ANIMALS[b].e).join('')}</div><div class="tiny muted">${A.name}</div></div>
+    <div style="font-size:18px;color:var(--sub);padding:0 6px">↔</div>
+    <div style="text-align:center"><div style="font-size:30px;letter-spacing:-3px">${B.saju.branches.filter(x=>x!==null).map(b=>ANIMALS[b].e).join('')}</div><div class="tiny muted">${B.name}</div></div>
+  </div>`;
+  // 오행 — 서로 채워주는 것
+  const oh=r.oh;
+  // 여기도 같은 함정 — 가장 큰 값 기준으로 정규화한다 (2026-08-14)
+  const bars=(who,cnt)=>{
+    const mx=Math.max(1,...ELEMENTS.map(e=>cnt[e])), H=34;
+    return `<div style="margin-bottom:9px"><div class="tiny muted" style="margin-bottom:4px">${who}</div>
+    <div style="display:flex;gap:4px;align-items:flex-end;height:${H}px">${ELEMENTS.map(e=>{
+      const n=cnt[e], info=EL[e];
+      return `<div style="flex:1;height:${n?Math.max(7,Math.round(n/mx*H)):3}px;background:${n?info.c:'#EDE4D4'};border-radius:4px;opacity:${n?1:.5}"></div>`;
+    }).join('')}</div>
+    <div style="display:flex;gap:4px;margin-top:3px">${ELEMENTS.map(e=>{
+      const n=cnt[e], info=EL[e];
+      return `<div style="flex:1;text-align:center;font-size:10px;color:${n?'var(--ink)':'var(--sub)'};font-weight:${n?700:400}">${info.e}${e} ${n}</div>`;
+    }).join('')}</div></div>`;
+  };
+  let ohTxt='';
+  const sideTxt=(me,you,st,side)=>{
+    let t='';
+    if(side.helps.length) t+=`<div class="meet"><div class="pair">${side.helps.map(e=>EL[e].e).join('')}</div>
+      <div class="txt"><div class="t1">${nim(you.name)}이 ${nim(me.name)}에게 힘이 돼요 — ${side.helps.join('·')}</div>
+      <div class="t2">${nim(me.name)}${josa(nim(me.name),'은','는')} <b>${st.kind}</b>${josa(st.kind,'이라','라')} ${st.kind==='신강'?'넘치는 힘을 <b>빼주는</b>':st.kind==='신약'?'모자란 힘을 <b>채워주는</b>':'비어 있는'} 기운이 도움이 돼요. ${side.helps.map(e=>EL[e].p).join(' / ')}</div></div></div>`;
+    if(side.burdens.length) t+=`<div class="meet"><div class="pair">${side.burdens.map(e=>EL[e].e).join('')}</div>
+      <div class="txt"><div class="t1">${nim(me.name)}에겐 조금 부담이에요 — ${side.burdens.join('·')}</div>
+      <div class="t2">${nim(me.name)}${josa(nim(me.name),'은','는')} 이미 <b>${st.kind}</b>${josa(st.kind,'이라','라')} 같은 방향이 더 쌓이면 무거워져요. 나쁜 사람이라는 뜻이 아니라 <b>같이 있을 때 지치기 쉽다</b>는 뜻이에요</div></div></div>`;
+    if(side.empty.length) t+=`<div class="meet"><div class="pair">${side.empty.map(e=>EL[e].e).join('')}</div>
+      <div class="txt"><div class="t1">둘 다 없어요 — ${side.empty.join('·')}</div>
+      <div class="t2">서로 채워줄 수 없는 자리예요. 그 몫은 <b>다른 사람이나 다른 방법</b>에서 구해야 합니다</div></div></div>`;
+    return t;
+  };
+  ohTxt += sideTxt(A,B,oh.SA,oh.a) + sideTxt(B,A,oh.SB,oh.b);
+  if(oh.floods.length) ohTxt+=`<div class="meet"><div class="pair">${oh.floods.map(e=>EL[e].e).join('')}</div>
+    <div class="txt"><div class="t1">둘 다 넘쳐요 — ${oh.floods.join('·')}</div>
+    <div class="t2">같은 기운이 양쪽에 많아요. 잘할 때는 같이 잘하는데, 한쪽으로 쏠리면 둘 다 못 멈춥니다</div></div></div>`;
+  if(!ohTxt) ohTxt=`<div class="tiny muted center" style="padding:10px 0">서로 크게 힘이 되거나 부담이 되는 기운은 없어요.</div>`;
+  $('mt-oh').innerHTML=bars(`${A.name} · ${oh.SA.kind}`,oh.A)+bars(`${B.name} · ${oh.SB.kind}`,oh.B)
+    +`<div class="hr" style="margin:10px 0"></div>`+ohTxt
+    +`<div class="disc">신강·신약 판정은 파(派)마다 기준이 갈립니다. 월지(계절)를 얼마나 크게 볼지, 지장간까지 셀지가 다르고, 경계에 있는 사주는 전문가끼리도 답이 다릅니다. <b>참고만 해주세요.</b></div>`;
+
+  // 만남
+  const top=r.meets.filter(m=>m.r.k!=='무난').slice(0,5);
+  $('mt-meets').innerHTML= top.length? top.map(m=>{
+    const a1=ANIMALS[m.ab],a2=ANIMALS[m.bb];
+    const pos=m.i===m.j?`둘 다 「${PILLAR_META[m.i].title}」끼리`
+      :`「${PILLAR_META[m.i].title}」 ↔ 「${PILLAR_META[m.j].title}」`;
+    // 내부 가중치 수치를 그대로 보여주지 않는다. 세기만 점으로 (2026-08-14)
+    const mag=Math.abs(m.eff), dots=mag>=8?'●●●':mag>=3?'●●':'●';
+    return `<div class="meet"><div class="pair">${a1.e}${a2.e}</div>
+      <div class="txt"><div class="t1">${a1.n} × ${a2.n} — ${m.r.k}</div>
+      <div class="t2">${m.r.t}<br><span style="opacity:.7">${pos}</span></div></div>
+      <div class="sc" style="color:${m.eff>0?'var(--good)':'var(--bad)'};letter-spacing:-1px">${m.eff>0?'+':'−'}${dots}</div></div>`;
+  }).join('') : `<div class="tiny muted center" style="padding:14px 0">특별히 얽힌 자리가 없어요. 서로 간섭이 적은 편입니다.</div>`;
+  // 둘 다 기운 좋은 날 — 무제한 구매자에게만. 약속·데이트 잡을 때 쓰는 자리라 실용적이다
+  const bothCard=$('mt-both');
+  if(GUEST){ bothCard.classList.add('hide'); }
+  else{
+    bothCard.classList.remove('hide');
+    if(!purchase.unlimited){
+      $('both-body').innerHTML=`<div style="filter:blur(4px);pointer-events:none;user-select:none" aria-hidden="true">
+          <div class="small">9/3 🐵 · 9/8 🐰 · 9/15 🐴 · 9/20 🐍 — 둘 다 기운이 도는 날이에요</div></div>
+        <div class="note" style="margin-top:10px">🔒 두 사람의 동물을 겹쳐 <b>같이 좋은 날</b>을 뽑아줘요. 약속이나 여행 날짜 잡을 때 쓰는 자리입니다.
+        <br><b>무제한(${PRICE_ALL.toLocaleString()}원)</b>에 들어 있어요.</div>`;
+    }else{
+      const now=new Date(), Y=now.getFullYear(), M=now.getMonth()+1, last=new Date(Y,M,0).getDate();
+      const rows=[];
+      for(let d=1;d<=last;d++){
+        const gi=dayGanjiIdx(Y,M,d), br=gi%12, st=gi%10;
+        const a=luckScore(A.saju,br,st).score, b=luckScore(B.saju,br,st).score;
+        if(a>=58&&b>=58) rows.push({d,br,st,a,b,min:Math.min(a,b)});
+      }
+      rows.sort((x,y)=>y.min-x.min);
+      $('both-body').innerHTML = rows.length
+        ? `<p class="small muted" style="margin:0 0 8px">${M}월에 두 분 모두 기운이 도는 날이에요.</p>`
+          + rows.slice(0,6).map(r=>`<div class="meet"><div class="pair">${ANIMALS[r.br].e}</div>
+              <div class="txt"><div class="t1">${M}월 ${r.d}일 — ${STEMS[r.st]}${BRANCHES[r.br]} ${ANIMALS[r.br].n}날</div>
+              <div class="t2">${A.name} ${r.a}점 · ${B.name} ${r.b}점</div></div></div>`).join('')
+        : `<p class="small muted">${M}월엔 둘 다 좋은 날이 없네요. 다음 달을 보는 게 낫겠어요.</p>`;
+    }
+  }
+  // 손님이면 초대한 사람의 동물원을 보여준다 — 다른 사람은 가림 처리 (2026-08-14)
+  renderHostZoo(r);
+  // 게스트 코드
+  if(GUEST){
+    $('mt-guest').classList.remove('hide');
+    $('mt-host').textContent=HOST.name;
+    $('guest-code').textContent='ZOO-'+packPerson({name:GUEST.name,saju:GUEST.saju,cat:curRel});
+  } else $('mt-guest').classList.add('hide');
+}
+
+let calType='solar';
+(function initLunarSelects(){
+  const y=$('l-y'), m=$('l-m'), d=$('l-d');
+  for(let v=1900;v<=2030;v++) y.insertAdjacentHTML('beforeend',`<option value="${v}"${v===1990?' selected':''}>${v}년</option>`);
+  for(let v=1;v<=12;v++) m.insertAdjacentHTML('beforeend',`<option value="${v}"${v===4?' selected':''}>${v}월</option>`);
+  for(let v=1;v<=30;v++) d.insertAdjacentHTML('beforeend',`<option value="${v}"${v===21?' selected':''}>${v}일</option>`);
+})();
+function updateLunarUI(){
+  const Y=+$('l-y').value, M=+$('l-m').value;
+  const canLeap=(()=>{try{return hasLeapMonth(Y,M)}catch(e){return false}})();
+  $('l-leap').disabled=!canLeap;
+  if(!canLeap)$('l-leap').checked=false;
+  $('l-leap-row').style.opacity=canLeap?1:.35;
+  $('l-leap-label').textContent=canLeap?`윤${M}월이에요 (${Y}년엔 윤${M}월이 있어요)`:`윤달 — ${Y}년 ${M}월엔 윤달이 없어요`;
+  const D=+$('l-d').value, leap=$('l-leap').checked;
+  const r=(()=>{try{return lunarToSolar(Y,M,D,leap)}catch(e){return {err:'변환하지 못했어요'}}})();
+  if(r.err){ $('l-preview').innerHTML=`⚠️ ${r.err}`; $('l-preview').dataset.ok=''; return; }
+  let msg=`음력 ${Y}년 ${leap?'윤':''}${M}월 ${D}일 → <b>양력 ${r.ymd}</b>`;
+  if(r.info.minsFromMidnight<90)
+    msg+=`<br>⚠️ 이 달이 시작되는 삭이 자정에서 ${Math.round(r.info.minsFromMidnight)}분 거리예요. <b>만세력마다 하루가 다를 수 있는 달</b>입니다.`;
+  $('l-preview').innerHTML=msg; $('l-preview').dataset.ok=r.ymd;
+  renderTimeUI();          // 생일이 바뀌면 시간대 경계도 바뀐다 (서머타임·옛 표준시)
+}
+['l-y','l-m','l-d','l-leap'].forEach(id=>$(id).addEventListener('change',updateLunarUI));
+document.querySelectorAll('#seg-cal button').forEach(b=>b.addEventListener('click',()=>{
+  document.querySelectorAll('#seg-cal button').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on'); calType=b.dataset.t;
+  $('f-date').classList.toggle('hide',calType==='lunar');
+  $('lunar-fields').classList.toggle('hide',calType==='solar');
+  if(calType==='lunar')updateLunarUI();
+}));
+
+let timeMode='exact', pickedBlockMin=null;
+function currentDateStr(){
+  if(calType==='lunar'){ const r=$('l-preview').dataset.ok; return r||null; }
+  return $('f-date').value||null;
+}
+function renderTimeUI(){
+  const date=currentDateStr();
+  if(!date){ $('time-hint').innerHTML='생년월일을 먼저 넣어주세요'; $('hour-blocks').innerHTML=''; return; }
+  const blocks=hourBlocks(date,$('f-solar').checked);
+  // 시각 모드 — 지금 넣은 시각이 어느 동물의 시간인지 즉시 보여준다
+  if(timeMode==='exact'){
+    const [hh,mi]=($('f-time').value||'12:00').split(':').map(Number);
+    const m=hh*60+mi, b=blockOfMinute(blocks,m);
+    if(b){
+      const a=ANIMALS[b.br];
+      let msg=`${a.e} <b>${a.n}의 시간</b> (${BRANCHES[b.br]}시) · ${b.label}`;
+      const edge=Math.min(m-b.from, b.to-m);
+      if(edge<=20) msg+=`<br>⚠️ 경계에서 ${edge}분 거리예요. <b>10분만 달라도 동물이 바뀝니다.</b> 정확하지 않으면 «동물 시간으로» 골라주세요.`;
+      $('time-hint').innerHTML=msg;
+    }
+  }
+  // 블록 모드 — 그 날의 실제 시계 범위로 라벨을 만든다
+  $('hour-blocks').innerHTML=`<div class="hblocks">`+blocks.map(b=>{
+    const a=ANIMALS[b.br];
+    return `<button class="hblk${pickedBlockMin===b.mid?' on':''}" data-mid="${b.mid}">
+      <span class="he">${a.e}</span>
+      <span><span class="hn">${a.n}의 시간</span><br><span class="hr">${b.label}</span></span></button>`;
+  }).join('')+`</div>
+  <div class="note" style="margin-top:9px">🐭 쥐의 시간이 둘로 나뉜 건 <b>자정을 걸치기 때문</b>이에요.
+  같은 쥐의 시간이라도 자정 전이냐 후냐에 따라 <b>날이 바뀌어서 다른 세 마리가 달라집니다.</b></div>`;
+  $('hour-blocks').querySelectorAll('.hblk').forEach(el=>el.addEventListener('click',()=>{
+    pickedBlockMin=+el.dataset.mid; renderTimeUI();
+  }));
+}
+document.querySelectorAll('#seg-time button').forEach(b=>b.addEventListener('click',()=>{
+  document.querySelectorAll('#seg-time button').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on'); timeMode=b.dataset.t;
+  $('time-exact').classList.toggle('hide',timeMode!=='exact');
+  $('time-block').classList.toggle('hide',timeMode!=='block');
+  renderTimeUI();
+}));
+$('f-time').addEventListener('input',renderTimeUI);
+$('f-date').addEventListener('change',renderTimeUI);
+$('f-solar').addEventListener('change',renderTimeUI);
+
+function chosenTime(){
+  if(timeMode==='none') return null;
+  if(timeMode==='block'){
+    if(pickedBlockMin===null) return undefined;   // 아직 안 고름
+    return `${String(Math.floor(pickedBlockMin/60)).padStart(2,'0')}:${String(pickedBlockMin%60).padStart(2,'0')}`;
+  }
+  return $('f-time').value||null;
+}
+$('btn-go').addEventListener('click',()=>{
+  const name=($('f-name').value||'').trim()||'나';
+  let date, lunarSrc=null;
+  if(calType==='lunar'){
+    const Y=+$('l-y').value,M=+$('l-m').value,D=+$('l-d').value,leap=$('l-leap').checked;
+    const r=lunarToSolar(Y,M,D,leap);
+    if(r.err){toast(r.err);return;}
+    date=r.ymd; lunarSrc={Y,M,D,leap,mins:r.info.minsFromMidnight};
+  }else{
+    date=$('f-date').value;
+    if(!date){toast('생년월일을 넣어주세요');return;}
+  }
+  const time=chosenTime();
+  if(time===undefined){toast('시간대를 하나 골라주세요');return;}
+  const saju=computeSaju(date,time,$('f-solar').checked);
+  saju.lunar=lunarSrc;
+  saju.timeMode=timeMode;
+  if(lunarSrc&&lunarSrc.mins<90)
+    saju.warn.push(`음력 ${lunarSrc.M}월이 시작되는 삭이 자정에서 ${Math.round(lunarSrc.mins)}분 거리예요. 만세력마다 하루가 다를 수 있는 달입니다.`);
+  const person={name,saju};
+  if(ADDING_FRIEND){
+    person.cat=document.querySelector('#seg-newcat button.on').dataset.c;
+    if(FRIENDS.some(f=>f.name===person.name)) FRIENDS=FRIENDS.filter(f=>f.name!==person.name);
+    else if(FRIENDS.length>=capacity()){ endAddFriend(); renderMap(); show('map');
+      toast('자리가 다 찼어요'); $('paywall').scrollIntoView({behavior:'smooth',block:'center'}); return; }
+    FRIENDS.push(person); save(); endAddFriend(); renderAll(); show('map');
+    toast(`${nim(person.name)}이 동물원에 들어왔어요 🐾`); return;
+  }
+  if(HOST){ GUEST=person; renderMatch(); show('match'); }
+  else { ME=person; save(); renderAll(); show('zoo'); }
+});
+
+function startAddFriend(){
+  ADDING_FRIEND=true; HOST=null; GUEST=null;
+  $('cat-pick').classList.remove('hide');
+  $('addingFrom').classList.remove('hide');
+  $('addingFrom').innerHTML='➕ <b>친구를 직접 넣는 중이에요.</b> 이름과 생년월일을 넣으면 내 동물원에 추가됩니다.';
+  $('inviteFrom').classList.add('hide');
+  $('f-name').value=''; $('btn-go').textContent='내 동물원에 넣기';
+  show('input'); renderTimeUI();
+}
+function endAddFriend(){
+  ADDING_FRIEND=false;
+  $('cat-pick').classList.add('hide'); $('addingFrom').classList.add('hide');
+  $('btn-go').textContent='내 동물 만나기';
+}
+$('btn-addself').addEventListener('click',startAddFriend);
+document.querySelectorAll('#seg-newcat button').forEach(b=>b.addEventListener('click',()=>{
+  document.querySelectorAll('#seg-newcat button').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on');
+}));
+$('btn-edit').addEventListener('click',()=>{
+  if(ME){ $('f-name').value=ME.name; $('f-date').value=ME.saju.date;
+    if(ME.saju.time)$('f-time').value=ME.saju.time;
+    const tm=ME.saju.timeMode||(ME.saju.time?'exact':'none');
+    document.querySelector(`#seg-time button[data-t="${tm}"]`).click();
+    if(tm==='block'&&ME.saju.time){ const [h,mi]=ME.saju.time.split(':').map(Number); pickedBlockMin=h*60+mi; }
+    const L=ME.saju.lunar;
+    document.querySelector(`#seg-cal button[data-t="${L?'lunar':'solar'}"]`).click();
+    if(L){ $('l-y').value=L.Y; $('l-m').value=L.M; $('l-d').value=L.D; $('l-leap').checked=L.leap; updateLunarUI(); }
+  }
+  HOST=null; show('input');
+});
+$('btn-toinvite').addEventListener('click',()=>{renderInvite();show('invite');});
+document.querySelectorAll('#nav button').forEach(b=>b.addEventListener('click',()=>{
+  const v=b.dataset.v; PAY_PROMPT=null;
+  if(v==='map')renderMap(); if(v==='luck')renderLuck(); if(v==='invite')renderInvite();
+  show(v);
+}));
+document.querySelectorAll('#seg-rel button').forEach(b=>b.addEventListener('click',()=>{
+  // 프로 전용: 같은 사람을 다른 사이로 바꿔 보기. 손님은 자기 관계를 고르는 중이라 언제나 자유
+  if(!isPro() && !GUEST && window.__viewFriend && b.dataset.r!==migrateCat(window.__viewFriend.cat)){
+    askPro('같은 사람을 다른 사이로도 보시겠어요?'); return;
+  }
+  document.querySelectorAll('#seg-rel button').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on'); curRel=b.dataset.r;
+  if(window.__viewFriend&&!GUEST){ window.__viewFriend.cat=curRel; save(); }
+  renderMatch();
+}));
+document.querySelectorAll('#seg-cat button').forEach(b=>b.addEventListener('click',()=>{
+  document.querySelectorAll('#seg-cat button').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on'); curCat=b.dataset.c; renderMap();
+}));
+// 프로 전용: 지난 달·다음 달 보기. 기본은 이번 달만
+const moveCal=d=>{
+  if(!isPro()){ askPro('지난 달·다음 달도 보시겠어요?'); return; }
+  calOffset+=d; renderLuck();
+};
+$('cal-prev').addEventListener('click',()=>moveCal(-1));
+$('cal-next').addEventListener('click',()=>moveCal(1));
+
+function inviteURL(){ return location.href.split('#')[0]+'#i='+packPerson(ME,true); }
+function renderInvite(){
+  if(!ME)return;
+  const u=inviteURL();
+  // 목업을 파일로 열면 주소가 data: URL이라 파일 전체가 링크로 보인다. 배포 후 모습으로 보여준다
+  $('inv-link').textContent = /^(data|blob):/.test(u)
+    ? `(배포 후 주소)/${u.slice(u.indexOf('#'))}`
+    : u;
+}
+$('btn-copy').addEventListener('click',async()=>{
+  try{await navigator.clipboard.writeText(inviteURL());toast('링크를 복사했어요 🔗');}
+  catch(e){toast('길게 눌러 복사해 주세요');}
+});
+
+$('btn-openlink').addEventListener('click',()=>{
+  if(!ME){toast('먼저 내 동물을 만들어주세요');return;}
+  PREVIEW_BACKUP={me:ME, friends:FRIENDS};
+  boot('#i='+packPerson(ME,true), true);
+  renderPreviewBar();
+});
+function renderPreviewBar(){
+  if(!PREVIEW_BACKUP){ $('preview-bar').classList.add('hide'); return; }
+  $('preview-bar').classList.remove('hide');
+  $('preview-bar').innerHTML=`<span>👀 <b>친구 시점</b>으로 보는 중이에요 — 친구에게는 이렇게 보입니다</span>
+    <button id="btn-endpreview">돌아가기</button>`;
+  $('btn-endpreview').addEventListener('click',()=>{
+    ME=PREVIEW_BACKUP.me; FRIENDS=PREVIEW_BACKUP.friends; PREVIEW_BACKUP=null;
+    HOST=null; GUEST=null; window.__viewFriend=null;
+    renderPreviewBar(); renderAll(); show('invite');
+  });
+}
+$('btn-copycode').addEventListener('click',async()=>{
+  try{await navigator.clipboard.writeText($('guest-code').textContent);toast('코드를 복사했어요');}
+  catch(e){toast('길게 눌러 복사해 주세요');}
+});
+const becomeMine=()=>{ ME=GUEST; HOST=null; GUEST=null; PREVIEW_BACKUP=null; renderPreviewBar();
+  location.hash=''; save(); renderAll(); show('zoo'); toast('내 동물원이 생겼어요 🐾'); };
+$('btn-mine').addEventListener('click',becomeMine);
+$('btn-makemine').addEventListener('click',becomeMine);
+function pasteFriend(inputId){
+  const v=($(inputId).value||'').trim().replace(/^ZOO-/,'');
+  if(!v){toast('코드를 붙여넣어 주세요');return;}
+  try{
+    const p=unpackPerson(v);
+    p.cat=migrateCat(p.cat);
+    const replacing=FRIENDS.some(f=>f.name===p.name);
+    // 이미 있는 친구를 갱신하는 건 자리를 새로 쓰는 게 아니다
+    if(!replacing && FRIENDS.length>=capacity()){
+      renderMap(); show('map'); toast('자리가 다 찼어요');
+      $('paywall').scrollIntoView({behavior:'smooth',block:'center'}); return;
+    }
+    if(replacing) FRIENDS=FRIENDS.filter(f=>f.name!==p.name);
+    FRIENDS.push(p); save(); $(inputId).value=''; renderAll(); show('map');
+    toast(`${nim(p.name)}이 동물원에 들어왔어요 🐾`);
+  }catch(e){ toast('코드를 못 읽었어요'); }
+}
+$('btn-paste').addEventListener('click',()=>pasteFriend('f-paste'));
+$('btn-paste2').addEventListener('click',()=>pasteFriend('f-paste2'));
+
+function zooName(){
+  // 초대 링크로 들어왔으면 여기는 '초대한 사람의 동물원'이다 — 손님이 생일을 넣기 전부터 그렇다
+  const who = HOST || ME;
+  return who ? `${who.name}의 동물원` : '동물원';
+}
+function renderBrand(){
+  const n=zooName();
+  $('logo').innerHTML = n==='동물원' ? '🐾 동물<span>원</span>'
+    : `🐾 ${n.slice(0,-1)}<span>원</span>`;
+  document.title = `${n} — 나와 함께 걷는 네 마리`;
+  const h=$('map-title'); if(h) h.textContent = ME?`${ME.name}의 동물원`:'나의 동물원';
+}
+function renderAll(){ renderBrand(); renderZoo(); renderMap(); renderLuck(); renderInvite(); renderTodayChip(); }
+function renderTodayChip(){
+  const n=new Date(), gi=dayGanjiIdx(n.getFullYear(),n.getMonth()+1,n.getDate()), br=gi%12, a=ANIMALS[br];
+  let t=`오늘 ${a.e}${a.n}날`;
+  // ⚠️ 천간을 빼먹으면 같은 화면에서 칩 34점 / 카드 36점으로 어긋난다 (2026-08-14)
+  if(ME){ const l=luckScore(ME.saju,br,gi%10); t+=` · ${l.score}점`; }
+  $('todaychip').textContent=t;
+}
+
+function boot(hashOverride, keepState){
+  if(!keepState) load();        // 미리보기로 들어올 땐 저장된 걸 다시 읽지 않는다
+  const h=(hashOverride!==undefined?hashOverride:location.hash).replace(/^#/,'');
+  if(h.startsWith('i=')){
+    try{
+      HOST=unpackPerson(h.slice(2));
+      if(keepState){ ME=null; FRIENDS=[]; GUEST=null; }   // 손님은 아직 자기 동물원이 없다
+      $('f-name').value=''; $('inviteFrom').classList.remove('hide');
+      const a=ANIMALS[HOST.saju.branches[2]];
+      $('inviteFrom').innerHTML=`🔗 <b>${HOST.name}의 동물원</b>에 초대받았어요. ${nim(HOST.name)}은 ${a.e}<b>${a.n}</b>${josa(a.n,'과','와')} 가장 가까이 걷는 분이에요.<br>생년월일을 넣으면 <b>우리 둘의 궁합</b>이 바로 나옵니다.`;
+      show('input'); renderBrand(); renderTimeUI(); renderTodayChip(); return;
+    }catch(e){}
+  }
+  renderTimeUI();
+  if(ME){ renderAll(); show('zoo'); }
+  else { renderBrand(); renderTodayChip(); show('input'); }
+}
+boot();
+
+window.__zoo={computeSaju,compat,branchRel,luckScore,dayGanjiIdx,ANIMALS,BRANCHES,STEMS,ganjiStr,jeolOf,boot,calibrate,lowNote,
+  lunarToSolar,lunarYear,lunarMonthInfo,hasLeapMonth,newMoonJD,jdnToYMD,deltaT,hourBlocks,
+  ohaeng,ohaengFit,strength,tenGodRole,ELEMENTS,EL,
+  PAY_ENABLED,FREE_LIMIT,PRICE_ONE,PRICE_ALL,capacity,remainFree,upgradeCost,isPro,PRO_FEATURES,store,
+  get WAITLIST(){return WAITLIST}, set WAITLIST(v){WAITLIST=v},
+  get purchase(){return purchase}, set purchase(v){purchase=v},
+  get ACCOUNT(){return ACCOUNT}, set ACCOUNT(v){ACCOUNT=v},
+  get HOST(){return HOST}, get GUEST(){return GUEST},
+  get ME(){return ME}, set ME(v){ME=v}, get FRIENDS(){return FRIENDS}, set FRIENDS(v){FRIENDS=v},
+  renderAll, show, save, packPerson, unpackPerson, gradeOf};
+</script>
+</body>
+</html>
