@@ -968,8 +968,8 @@ function compat(a,b,type){
   // 천간(일간) — 끌림과 충돌
   let stemTerm=0, stemNote=null;
   const as=a.stems[2], bs=b.stems[2];
-  if(has2(STEM_HAP,as,bs)){ stemTerm=W.hap; stemNote={k:'천간합',t:`${STEMS[as]}과 ${STEMS[bs]} — 서로 끌리는 기운이 있어요`}; }
-  else if(has2(STEM_CHUNG,as,bs)){ stemTerm=W.chung; stemNote={k:'천간충',t:`${STEMS[as]}과 ${STEMS[bs]} — 생각하는 방향이 정면으로 달라요`}; }
+  if(has2(STEM_HAP,as,bs)){ stemTerm=W.hap; stemNote={k:'천간합',t:`${STEMS[as]}${josa(STEMS[as],"과","와")} ${STEMS[bs]} — 서로 끌리는 기운이 있어요`}; }
+  else if(has2(STEM_CHUNG,as,bs)){ stemTerm=W.chung; stemNote={k:'천간충',t:`${STEMS[as]}${josa(STEMS[as],"과","와")} ${STEMS[bs]} — 생각하는 방향이 정면으로 달라요`}; }
   // 삼합 완성 (둘의 지지를 합쳐 세 마리가 다 모이면)
   const allBr=[...a.branches,...b.branches].filter(x=>x!==null);
   let trioBonus=0, trios=[];
@@ -1029,8 +1029,8 @@ function luckScore(me, br, st){
   let stemTerm=0, stemNote=null;
   if(st!==undefined && st!==null){
     const my=me.stems[2];
-    if(has2(STEM_HAP,my,st)){ stemTerm=6; stemNote={k:'천간합',t:`${STEMS[my]}과 ${STEMS[st]}이 손을 잡는 날`}; }
-    else if(has2(STEM_CHUNG,my,st)){ stemTerm=-5; stemNote={k:'천간충',t:`${STEMS[my]}과 ${STEMS[st]}이 부딪히는 날`}; }
+    if(has2(STEM_HAP,my,st)){ stemTerm=6; stemNote={k:'천간합',t:`${STEMS[my]}${josa(STEMS[my],"과","와")} ${STEMS[st]}${josa(STEMS[st],"이","가")} 손을 잡는 날`}; }
+    else if(has2(STEM_CHUNG,my,st)){ stemTerm=-5; stemNote={k:'천간충',t:`${STEMS[my]}${josa(STEMS[my],"과","와")} ${STEMS[st]}${josa(STEMS[st],"이","가")} 부딪히는 날`}; }
     else if(my===st){ stemTerm=2; stemNote={k:'같은 천간',t:'나와 같은 기운이 도는 날'}; }
   }
   return {score:Math.max(5,Math.min(98,Math.round(50+avg*3.6+stemTerm))), best, stemNote};
