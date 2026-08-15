@@ -123,6 +123,12 @@ select.inp{-webkit-appearance:none;appearance:none;padding-right:30px;
 .fitem .nmm{font-weight:700;font-size:14.5px}
 .fitem .sub{font-size:11.5px;color:var(--sub)}
 .fitem .sc{margin-left:auto;font-weight:900;font-size:18px}
+.delx{flex-shrink:0;width:30px;height:30px;border-radius:99px;color:#C4B8A6;font-size:14px;
+  display:flex;align-items:center;justify-content:center;margin-left:2px}
+.delx:hover,.delx:focus-visible{background:#FBEEEA;color:var(--bad)}
+.delbtn{flex-shrink:0;border-radius:99px;padding:7px 13px;font-size:12.5px;font-weight:800;margin-left:5px}
+.delbtn.no{background:#fff;border:1.5px solid var(--line);color:var(--sub)}
+.delbtn.yes{background:var(--bad);color:#fff}
 
 .cal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-top:10px}
 .cal .dow{text-align:center;font-size:11px;color:var(--sub);font-weight:700;padding:4px 0}
@@ -464,6 +470,10 @@ select.inp{-webkit-appearance:none;appearance:none;padding-right:30px;
   <div class="card" id="mt-both">
     <h3 style="font-size:16px">둘 다 기운 좋은 날</h3>
     <div id="both-body" style="margin-top:8px"></div>
+  </div>
+
+  <div id="mt-remove" class="center hide" style="margin:2px 0 14px">
+    <button class="tiny" id="btn-removefriend" style="color:#B4A896;text-decoration:underline">동물원에서 빼기</button>
   </div>
 
   <div id="mt-hostzoo" class="card hide">
@@ -1051,7 +1061,7 @@ const store={
 };
 const LS='zoo_v1';
 let ME=null, FRIENDS=[], GUEST=null, HOST=null, curRel='친구', curCat='all', calOffset=0, ACCOUNT=null;
-let PREVIEW_BACKUP=null, ADDING_FRIEND=false, PAY_PROMPT=null, curSub='부모';
+let PREVIEW_BACKUP=null, ADDING_FRIEND=false, PAY_PROMPT=null, curSub='부모', pendingDelete=null;
 
 function askPro(reason){
   PAY_PROMPT=reason; renderMap(); show('map');
@@ -1360,13 +1370,37 @@ function renderMap(){
     ${nodes}</svg>`;
   $('map-list').innerHTML = list.length? list.map(f=>{
     const r=compat(ME.saju,f.saju,relOf(f)), a=ANIMALS[f.saju.branches[2]], g=gradeOf(r.score);
-    return `<div class="fitem" data-nm="${encodeURIComponent(f.name)}" style="cursor:pointer">
+    const nm=encodeURIComponent(f.name);
+    // 지우기 전에 한 번 확인한다 — 실수로 스친 것과 정말 지우려는 것을 가른다
+    if(pendingDelete===f.name) return `<div class="fitem" style="background:#FFF3EF;border-radius:12px;padding:11px 12px">
+      <div class="fav" style="border-color:var(--bad);opacity:.5">${a.e}</div>
+      <div style="flex:1"><div class="nmm">${nim(f.name)} 지울까요?</div>
+      <div class="sub">동물원에서 빠지고, 자리도 하나 돌아와요</div></div>
+      <button class="delbtn no" data-nm="${nm}">그대로</button>
+      <button class="delbtn yes" data-nm="${nm}">지우기</button></div>`;
+    return `<div class="fitem" data-nm="${nm}" style="cursor:pointer">
       <div class="fav" style="border-color:${CAT_COLOR[migrateCat(f.cat)]}">${a.e}</div>
-      <div><div class="nmm">${f.name} <span class="tagpill" style="background:${CAT_COLOR[migrateCat(f.cat)]}">${f.sub?f.sub:CAT_LABEL[migrateCat(f.cat)]}</span></div>
+      <div style="flex:1;min-width:0"><div class="nmm">${f.name} <span class="tagpill" style="background:${CAT_COLOR[migrateCat(f.cat)]}">${f.sub?f.sub:CAT_LABEL[migrateCat(f.cat)]}</span></div>
       <div class="sub">${g.l}</div></div>
-      <div class="sc" style="color:${scoreColor(r.score)}">${r.score}</div></div>`;
+      <div class="sc" style="color:${scoreColor(r.score)}">${r.score}</div>
+      <button class="delx" data-nm="${nm}" aria-label="${f.name} 지우기">✕</button></div>`;
   }).join('') : `<div class="tiny muted center" style="padding:18px 0">초대 탭에서 링크를 복사해 친구에게 보내보세요 🔗</div>`;
-  $('map-list').querySelectorAll('.fitem').forEach(el=>el.addEventListener('click',()=>{
+  // 삭제 — ✕ 누르면 그 줄이 확인 줄로 바뀐다
+  $('map-list').querySelectorAll('.delx').forEach(b=>b.addEventListener('click',e=>{
+    e.stopPropagation(); pendingDelete=decodeURIComponent(b.dataset.nm); renderMap();
+  }));
+  $('map-list').querySelectorAll('.delbtn.no').forEach(b=>b.addEventListener('click',e=>{
+    e.stopPropagation(); pendingDelete=null; renderMap();
+  }));
+  $('map-list').querySelectorAll('.delbtn.yes').forEach(b=>b.addEventListener('click',e=>{
+    e.stopPropagation();
+    const nm=decodeURIComponent(b.dataset.nm);
+    FRIENDS=FRIENDS.filter(f=>f.name!==nm);
+    if(window.__viewFriend&&window.__viewFriend.name===nm) window.__viewFriend=null;
+    pendingDelete=null; save(); renderAll(); show('map');
+    toast(`${nim(nm)}을 지웠어요`);
+  }));
+  $('map-list').querySelectorAll('.fitem[data-nm]').forEach(el=>el.addEventListener('click',()=>{
     const nm=decodeURIComponent(el.dataset.nm);
     const f=FRIENDS.find(x=>x.name===nm); if(!f)return;
     window.__viewFriend=f; curRel=migrateCat(f.cat); curSub=f.sub||'부모';
@@ -1641,6 +1675,8 @@ function renderMatch(){
         : `<p class="small muted">${M}월엔 둘 다 좋은 날이 없네요. 다음 달을 보는 게 낫겠어요.</p>`;
     }
   }
+  // 내 친구를 보고 있을 때만 빼기 버튼 (손님 화면에는 없다)
+  $('mt-remove').classList.toggle('hide', !!GUEST || !window.__viewFriend);
   // 손님이면 초대한 사람의 동물원을 보여준다 — 다른 사람은 가림 처리 (2026-08-14)
   renderHostZoo(r);
   // 게스트 코드
@@ -1908,6 +1944,13 @@ const becomeMine=()=>{
   location.hash=''; save(); renderAll(); show('zoo');
   toast(host? `내 동물원이 생겼어요 🐾 ${nim(host.name)}도 같이 들어왔어요` : '내 동물원이 생겼어요 🐾');
 };
+
+$('btn-removefriend').addEventListener('click',()=>{
+  if(!window.__viewFriend)return;
+  pendingDelete=window.__viewFriend.name;
+  renderMap(); show('map');
+  $('map-list').scrollIntoView({behavior:'smooth',block:'center'});
+});
 $('btn-mine').addEventListener('click',becomeMine);
 $('btn-makemine').addEventListener('click',becomeMine);
 function pasteFriend(inputId){
