@@ -354,8 +354,16 @@ select.inp{-webkit-appearance:none;appearance:none;padding-right:30px;
     <div class="flist" id="map-list"></div>
   </div>
   <div class="card">
-    <h3 style="font-size:15px">친구가 보낸 코드 붙여넣기</h3>
-    <p class="tiny muted" style="margin:6px 0 10px">친구가 내 링크로 궁합을 본 뒤 보내준 코드를 여기에 넣으면 동물원에 들어와요.</p>
+    <h3 style="font-size:16px">친구 넣기</h3>
+
+    <p class="small" style="margin:11px 0 6px"><b>생년월일을 이미 알고 있다면</b></p>
+    <p class="tiny muted" style="margin:0 0 9px">가족처럼 아는 생일은 직접 넣어도 됩니다.</p>
+    <button class="btn sm ghost" id="btn-addself">내가 직접 입력하기</button>
+
+    <div class="hr" style="margin:15px 0"></div>
+
+    <p class="small" style="margin:0 0 6px"><b>친구가 코드를 보내줬다면</b></p>
+    <p class="tiny muted" style="margin:0 0 9px">친구가 내 링크로 궁합을 본 뒤 보내준 코드예요.</p>
     <input class="inp" id="f-paste" placeholder="ZOO-... 코드 붙여넣기">
     <div style="margin-top:8px"><button class="btn sm ghost" id="btn-paste">동물원에 넣기</button></div>
   </div>
@@ -389,44 +397,35 @@ select.inp{-webkit-appearance:none;appearance:none;padding-right:30px;
 <!-- ============ 4. 초대 ============ -->
 <section id="v-invite" class="hide">
   <div class="card">
-    <h2 style="font-size:19px">친구 초대하기</h2>
-    <p class="small muted" style="margin:6px 0 0"><b>친구가 자기 손으로 넣게 하는 게 좋아요.</b> 그래야 친구도 자기 네 마리를 만나고, 자기 동물원을 갖게 되거든요.</p>
-    <div class="loop">
-      <div class="lp"><span class="ln">1</span>링크를 카톡으로 보낸다</div>
-      <div class="lp"><span class="ln">2</span>친구가 생년월일을 넣는다 <span class="muted">— 설치·가입 없음</span></div>
-      <div class="lp"><span class="ln">3</span>친구가 <b>우리 둘의 궁합</b>을 바로 본다</div>
-      <div class="lp"><span class="ln">4</span>친구가 <b>자기 동물원</b>을 만들면 <b>내가 자동으로</b> 거기 들어간다</div>
-      <div class="lp"><span class="ln">5</span>친구가 코드를 보내주면 <b>친구도</b> 내 동물원에 들어온다</div>
-    </div>
+    <h2 style="font-size:19px">친구에게 공유해보세요</h2>
+    <p class="small muted" style="margin:6px 0 0">링크만 보내면 됩니다. 친구는 설치도 가입도 필요 없어요.</p>
+
     <div style="margin:14px 0 8px"><div class="copybox" id="inv-link"></div></div>
     <button class="btn" id="btn-copy">링크 복사하기</button>
-    <div style="margin-top:8px"><button class="btn sm ghost" id="btn-openlink">친구에게 어떻게 보이는지 미리보기</button></div>
+
+    <p class="small" style="margin:14px 0 0;line-height:1.6">
+      <b>친구가 생일만 넣으면</b> 그 자리에서 <b>우리 둘의 궁합</b>이 나오고,
+      그 친구가 <b>내 관계도에 나타납니다.</b><br>
+      <span class="muted">친구도 자기 동물 네 마리를 만나게 되고요.</span>
+    </p>
+
+    <div style="margin-top:12px"><button class="btn sm ghost" id="btn-openlink">친구에게 어떻게 보이는지 미리보기</button></div>
+
     <div class="note" style="margin-top:14px">🔒 이 링크에 담기는 것은 <b>내 동물 네 마리 · 내 이름 · 내 동물원에 몇 명이 어떤 사이로 있는지</b>입니다.
       친구는 그 사람들을 <b>가림 처리로만</b> 보고, <b>이름과 생년월일은 담기지 않습니다.</b><br>
       서버를 거치지 않고, 친구가 넣은 생년월일도 <b>친구 폰에서만</b> 계산됩니다.</div>
   </div>
 
-  <div class="card">
-    <h3 style="font-size:16px">내 코드 보내기</h3>
-    <p class="tiny muted" style="margin:6px 0 10px"><b>이미 자기 동물원이 있는 친구</b>가 나를 넣고 싶어 할 때 쓰세요.
-      복사하면 <b>설명과 주소까지 붙은 메시지</b>가 통째로 담깁니다 — 카톡에 그대로 붙여넣으면 돼요.<br>
-      <span style="color:var(--pt)">아직 동물원이 없는 친구에겐 위의 <b>초대 링크</b>를 보내세요.</span> 그러면 친구가 자기 동물원을 만들 때 <b>내가 자동으로 들어갑니다.</b></p>
-    <div class="copybox" id="my-code"></div>
-    <div style="margin-top:8px"><button class="btn sm ghost" id="btn-copymine">메시지째로 복사</button></div>
-  </div>
-
-  <div class="card">
-    <h3 style="font-size:16px">친구를 넣는 다른 방법</h3>
-
-    <p class="small" style="margin:10px 0 6px"><b>친구가 코드를 보내줬다면</b></p>
-    <input class="inp" id="f-paste2" placeholder="ZOO-... 코드 붙여넣기">
-    <div style="margin-top:8px"><button class="btn sm ghost" id="btn-paste2">동물원에 넣기</button></div>
-
-    <div class="hr" style="margin:14px 0"></div>
-
-    <p class="small" style="margin:0 0 6px"><b>생년월일을 이미 알고 있다면</b></p>
-    <p class="tiny muted" style="margin:0 0 9px">가족처럼 아는 생일은 직접 넣어도 됩니다. 다만 <b>친구에게는 링크를 보내는 쪽이 좋아요</b> — 친구도 자기 동물을 보게 되니까요.</p>
-    <button class="btn sm ghost" id="btn-addself">내가 직접 입력하기</button>
+  <div class="card" style="padding:14px 16px">
+    <button id="btn-mycode-toggle" style="width:100%;display:flex;align-items:center;gap:8px;text-align:left">
+      <span style="font-weight:700;font-size:14px">이미 동물원이 있는 친구라면</span>
+      <span id="mycode-arrow" style="margin-left:auto;color:var(--sub)">▾</span>
+    </button>
+    <div id="mycode-body" class="hide" style="margin-top:10px">
+      <p class="tiny muted" style="margin:0 0 10px">친구가 <b>자기 동물원에 나를 넣을 때</b> 쓰는 코드예요. 복사하면 설명과 주소까지 붙은 메시지가 통째로 담깁니다.</p>
+      <div class="copybox" id="my-code"></div>
+      <div style="margin-top:8px"><button class="btn sm ghost" id="btn-copymine">메시지째로 복사</button></div>
+    </div>
   </div>
 </section>
 
@@ -1799,9 +1798,9 @@ $('btn-go').addEventListener('click',()=>{
     if(FRIENDS.some(f=>f.name===person.name)) FRIENDS=FRIENDS.filter(f=>f.name!==person.name);
     else if(FRIENDS.length>=capacity()){ endAddFriend(); renderMap(); show('map');
       toast('자리가 다 찼어요'); $('paywall').scrollIntoView({behavior:'smooth',block:'center'}); return; }
-    // 넣던 자리(초대 탭)에 그대로 둔다 — 관계도로 보내버리면 연달아 넣을 수가 없다 (2026-08-15)
-    FRIENDS.push(person); save(); endAddFriend(); renderAll(); show('invite');
-    toast(`${nim(person.name)}이 들어왔어요 🐾 관계도에서 볼 수 있어요`); return;
+    // 넣던 자리(관계도)로 돌아온다 — 「친구 넣기」가 거기 있어서 연달아 넣을 수 있다 (2026-08-15)
+    FRIENDS.push(person); save(); endAddFriend(); renderAll(); show('map');
+    toast(`${nim(person.name)}이 들어왔어요 🐾`); return;
   }
   if(HOST){ GUEST=person; renderMatch(); show('match'); }
   else { ME=person; save(); renderAll(); show('zoo'); }
@@ -1966,13 +1965,15 @@ function pasteFriend(inputId){
       $('paywall').scrollIntoView({behavior:'smooth',block:'center'}); return;
     }
     if(replacing) FRIENDS=FRIENDS.filter(f=>f.name!==p.name);
-    FRIENDS.push(p); save(); $(inputId).value=''; renderAll();
-    show(inputId==='f-paste2' ? 'invite' : 'map');    // 붙여넣은 자리에 그대로 둔다
+    FRIENDS.push(p); save(); $(inputId).value=''; renderAll(); show('map');
     toast(`${nim(p.name)}이 들어왔어요 🐾`);
   }catch(e){ toast('코드를 못 읽었어요'); }
 }
 $('btn-paste').addEventListener('click',()=>pasteFriend('f-paste'));
-$('btn-paste2').addEventListener('click',()=>pasteFriend('f-paste2'));
+$('btn-mycode-toggle').addEventListener('click',()=>{
+  const b=$('mycode-body'), open=b.classList.contains('hide');
+  b.classList.toggle('hide',!open); $('mycode-arrow').textContent=open?'▴':'▾';
+});
 
 function zooName(){
   // 초대 링크로 들어왔으면 여기는 '초대한 사람의 동물원'이다 — 손님이 생일을 넣기 전부터 그렇다
