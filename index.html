@@ -13,6 +13,8 @@
   --shadow:0 2px 10px rgba(122,100,70,.08);
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+
+button,.seg button,.hblk,.plan,.fitem,input,select,label{touch-action:manipulation}
 html,body{margin:0;padding:0}
 body{
   background:var(--bg); color:var(--ink);
@@ -46,11 +48,31 @@ input,select{font-family:inherit;font-size:16px}
 .row{display:flex;gap:8px}
 .row>*{flex:1}
 label.fld{display:block;margin:14px 0 6px;font-weight:700;font-size:13.5px}
-.inp{width:100%;padding:13px 14px;border:1.5px solid var(--line);border-radius:14px;background:#fff;color:var(--ink)}
+.inp{width:100%;padding:13px 14px;border:1.5px solid var(--line);border-radius:14px;background:#fff;color:var(--ink);
+  min-height:50px;line-height:1.2}
 .inp:focus{outline:none;border-color:var(--pt)}
+
+input[type="date"],input[type="time"]{-webkit-appearance:none;appearance:none;
+  display:block;width:100%;font-variant-numeric:tabular-nums}
+input[type="date"]::-webkit-date-and-time-value,
+input[type="time"]::-webkit-date-and-time-value{text-align:left;margin:0}
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="time"]::-webkit-calendar-picker-indicator{opacity:.55;cursor:pointer}
+select.inp{-webkit-appearance:none;appearance:none;padding-right:30px;
+  background-image:linear-gradient(45deg,transparent 50%,var(--sub) 50%),linear-gradient(135deg,var(--sub) 50%,transparent 50%);
+  background-position:calc(100% - 17px) 22px,calc(100% - 12px) 22px;background-size:5px 5px,5px 5px;background-repeat:no-repeat}
 .chkline{display:flex;align-items:center;gap:8px;margin-top:9px;font-size:13.5px;color:var(--sub)}
 .chkline input{width:17px;height:17px;accent-color:var(--pt)}
 .note{background:#FFF6EC;border:1px solid #F6E0C8;border-radius:14px;padding:11px 13px;font-size:12.5px;color:#8a6a45;line-height:1.55}
+
+.hidden-four{display:flex;justify-content:center;gap:6px}
+.hidden-four span{font-size:42px;line-height:1;filter:brightness(0);opacity:.16;
+  animation:breathe 3.4s ease-in-out infinite}
+.hidden-four span:nth-child(2){animation-delay:.35s}
+.hidden-four span:nth-child(3){animation-delay:.7s}
+.hidden-four span:nth-child(4){animation-delay:1.05s}
+@keyframes breathe{0%,100%{opacity:.13;transform:translateY(0)}50%{opacity:.26;transform:translateY(-3px)}}
+@media (prefers-reduced-motion:reduce){.hidden-four span{animation:none;opacity:.18}}
 
 .zoo{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
 .beast{background:#fff;border:1.5px solid var(--line);border-radius:18px;padding:13px 7px;text-align:center;position:relative;overflow:hidden}
@@ -181,7 +203,10 @@ label.fld{display:block;margin:14px 0 6px;font-weight:700;font-size:13.5px}
 <!-- ============ 0. 시작 / 입력 ============ -->
 <section id="v-input">
   <div class="card center" style="padding-top:26px">
-    <div style="font-size:44px;letter-spacing:-6px">🐯🐰🐴🐭</div>
+    <div class="hidden-four" aria-label="아직 만나지 않은 동물 네 마리">
+      <span>🐯</span><span>🐰</span><span>🐴</span><span>🐭</span>
+    </div>
+    <p class="tiny" style="margin:8px 0 0;color:#B4A896;letter-spacing:-.02em">아직 만나지 않은 네 마리예요</p>
     <h1 style="font-size:22px;margin-top:12px;line-height:1.4;letter-spacing:-.03em">인생은 네 마리의 동물과<br>함께 걷는 여행입니다.</h1>
     <p class="small muted" style="margin:12px 0 0">사주팔자의 네 기둥은 원래 열두 동물에서 시작되었습니다.<br>생년월일 속에 숨겨진 나만의 네 마리 동물을 만나보세요.</p>
   </div>
@@ -194,8 +219,12 @@ label.fld{display:block;margin:14px 0 6px;font-weight:700;font-size:13.5px}
       <label class="fld">어떤 사이인가요?</label>
       <div class="seg" id="seg-newcat">
         <button data-c="가족">가족</button><button data-c="직장">직장</button>
-        <button data-c="친구" class="on">친구</button><button data-c="연인">연인</button>
+        <button data-c="친구" class="on">친구</button><button data-c="연인">연인·배우자</button>
       </div>
+      <div class="seg hide" id="seg-newsub" style="margin-top:-4px">
+        <button data-s="부모" class="on">부모</button><button data-s="자식">자식</button><button data-s="형제">형제</button>
+      </div>
+      <div id="newsub-why" class="tiny muted hide" style="margin:-4px 0 0"></div>
     </div>
 
     <label class="fld">이름 <span class="muted" style="font-weight:400">(별명도 좋아요)</span></label>
@@ -275,16 +304,13 @@ label.fld{display:block;margin:14px 0 6px;font-weight:700;font-size:13.5px}
     <div id="raw-warn" class="note hide" style="margin-top:10px"></div>
   </div>
 
-  <button class="btn" id="btn-toinvite" style="margin-bottom:8px">친구는 무슨 동물일까? 초대하기</button>
-</section>
+  <button class="btn" id="btn-toinvite">친구는 무슨 동물일까? 초대하기</button>
 
-<!-- ============ 2. 관계도 ============ -->
-<section id="v-map" class="hide">
   <div class="card" id="acct-card" style="padding:14px 16px">
     <div id="acct-body"></div>
   </div>
 
-  <div class="card" id="plan-card" style="padding:14px 16px">
+  <div class="card" id="plan-card" style="padding:14px 16px;margin-bottom:8px">
     <button id="btn-plan" style="width:100%;display:flex;align-items:center;gap:8px;text-align:left">
       <span id="plan-title" style="font-weight:700;font-size:14px">기본과 프로, 뭐가 다른가요?</span>
       <span id="plan-badge"></span>
@@ -292,7 +318,10 @@ label.fld{display:block;margin:14px 0 6px;font-weight:700;font-size:13.5px}
     </button>
     <div id="plan-body" class="hide" style="margin-top:10px"></div>
   </div>
+</section>
 
+<!-- ============ 2. 관계도 ============ -->
+<section id="v-map" class="hide">
   <div class="card">
     <div style="display:flex;align-items:baseline">
       <h2 style="font-size:19px" id="map-title">나의 동물원</h2>
@@ -371,15 +400,23 @@ label.fld{display:block;margin:14px 0 6px;font-weight:700;font-size:13.5px}
   </div>
 
   <div class="card">
-    <h3 style="font-size:16px">친구가 코드를 보내줬다면</h3>
-    <p class="tiny muted" style="margin:6px 0 10px">친구가 궁합을 본 뒤 보내준 코드를 넣으면 동물원에 들어와요.</p>
-    <input class="inp" id="f-paste2" placeholder="ZOO-... 코드 붙여넣기">
-    <div style="margin-top:8px"><button class="btn sm ghost" id="btn-paste2">동물원에 넣기</button></div>
+    <h3 style="font-size:16px">내 코드 보내기</h3>
+    <p class="tiny muted" style="margin:6px 0 10px">친구가 <b>자기 동물원에 나를 넣고 싶어 할 때</b> 이 코드를 보내주세요. 링크와 반대 방향이에요.</p>
+    <div class="copybox" id="my-code"></div>
+    <div style="margin-top:8px"><button class="btn sm ghost" id="btn-copymine">내 코드 복사</button></div>
   </div>
 
   <div class="card">
-    <h3 style="font-size:16px">생년월일을 이미 알고 있다면</h3>
-    <p class="tiny muted" style="margin:6px 0 10px">가족처럼 이미 아는 생일은 직접 넣어도 됩니다. 다만 <b>친구에게는 링크를 보내는 쪽이 좋아요</b> — 친구도 자기 동물을 보게 되니까요.</p>
+    <h3 style="font-size:16px">친구를 넣는 다른 방법</h3>
+
+    <p class="small" style="margin:10px 0 6px"><b>친구가 코드를 보내줬다면</b></p>
+    <input class="inp" id="f-paste2" placeholder="ZOO-... 코드 붙여넣기">
+    <div style="margin-top:8px"><button class="btn sm ghost" id="btn-paste2">동물원에 넣기</button></div>
+
+    <div class="hr" style="margin:14px 0"></div>
+
+    <p class="small" style="margin:0 0 6px"><b>생년월일을 이미 알고 있다면</b></p>
+    <p class="tiny muted" style="margin:0 0 9px">가족처럼 아는 생일은 직접 넣어도 됩니다. 다만 <b>친구에게는 링크를 보내는 쪽이 좋아요</b> — 친구도 자기 동물을 보게 되니까요.</p>
     <button class="btn sm ghost" id="btn-addself">내가 직접 입력하기</button>
   </div>
 </section>
@@ -392,8 +429,12 @@ label.fld{display:block;margin:14px 0 6px;font-weight:700;font-size:13.5px}
       <button data-r="가족">가족</button>
       <button data-r="직장">직장</button>
       <button data-r="친구" class="on">친구</button>
-      <button data-r="연인">연인</button>
+      <button data-r="연인">연인·배우자</button>
     </div>
+    <div class="seg hide" id="seg-sub" style="margin-top:-6px">
+      <button data-s="부모" class="on">부모</button><button data-s="자식">자식</button><button data-s="형제">형제</button>
+    </div>
+    <div id="sub-why" class="tiny muted hide" style="margin:-4px 0 8px;text-align:center"></div>
     <div class="scorebig">
       <div class="n" id="mt-score">—<small>점</small></div>
       <div class="lbl" id="mt-label">—</div>
@@ -866,7 +907,24 @@ const REL_W={
   // 친구: 일지(가까운 나)가 중심. 뿌리보다 지금의 결이 맞아야 한다
   '친구':{same:[1.4,0.9,2.4,1.0],cross:0.25,hap:6,chung:-4,hyungMul:0.90,chungMul:0.95},
 };
+
+const FAMILY_SUBS=['부모','자식','형제'];
+Object.assign(REL_W,{
+  '가족·부모':{same:[1.6,2.9,0.8,0.9],cross:0.25,hap:5,chung:-3,hyungMul:1.50,chungMul:0.60},
+  '가족·자식':{same:[0.9,1.1,1.0,2.9],cross:0.25,hap:5,chung:-3,hyungMul:1.40,chungMul:0.60},
+  // 형제는 월주(부모궁)를 부모와 나눠 쓰지만 십성으로는 비겁(같은 기운)이다.
+  // 부모와 같은 무게를 주면 둘이 3점 차이로 뭉개진다 → 년주 쪽으로 민다 (2026-08-15 측정)
+  '가족·형제':{same:[2.7,1.5,1.2,0.9],cross:0.25,hap:6,chung:-3,hyungMul:1.30,chungMul:0.70},
+});
+const SUB_WHY={
+  '부모':'부모는 <b>월주</b>에서 봅니다 — 내가 자란 환경이 곧 부모 자리예요',
+  '자식':'자식은 <b>시주</b>에서 봅니다 — 나중에 나오는 동물이 곧 자식 자리예요',
+  '형제':'형제는 <b>월주와 년주</b>에서 봅니다 — 같은 뿌리에서 갈라진 자리예요',
+};
 const CATS=['가족','직장','친구','연인'];
+const CAT_LABEL={'가족':'가족','직장':'직장','친구':'친구','연인':'연인·배우자'};
+
+const relOf=f=>{ const c=migrateCat(f.cat); return (c==='가족'&&f.sub)? '가족·'+f.sub : c; };
 const CAT_COLOR={'가족':'var(--fam)','직장':'var(--wrk)','친구':'var(--acq)','연인':'var(--lov)'};
 const migrateCat=c=>c==='지인'?'친구':(CATS.includes(c)?c:'친구');   // 옛 '지인' 데이터 이관
 
@@ -875,7 +933,7 @@ function calibrate(s){
   return Math.max(8, Math.min(97, Math.round(v)));
 }
 function compat(a,b,type){
-  const W=REL_W[migrateCat(type)]||REL_W['친구'];
+  const W=REL_W[type]||REL_W[migrateCat(type)]||REL_W['친구'];
   let raw=0, totW=0, meets=[];
   for(let i=0;i<4;i++){
     if(a.branches[i]===null)continue;
@@ -928,6 +986,7 @@ function gradeOf(s){ return GRADES.find(g=>s>=g.min); }
 
 function lowNote(score,type){
   if(score>=45) return '';
+  type=String(type).split('·')[0];        // '가족·부모' → '가족'
   if(type==='연인') return '일지가 정면으로 마주 선 조합일 때 이렇게 나와요. 사주에서 가장 많이 이야기되는 자리인데, <b>오래 가는 커플도 여기 많습니다</b> — 부딪히는 지점이 뻔해서 미리 정해둘 수 있거든요.';
   if(type==='가족') return '가족은 고를 수 없죠. 이 숫자는 <b>맞고 틀리고가 아니라 결이 다르다</b>는 뜻이에요. 자주 붙어 있기보다 각자의 리듬을 인정할 때 편해지는 사이입니다.';
   if(type==='직장') return '일하는 방식이 서로 많이 달라요. <b>사람이 문제가 아니라 속도와 순서가 다른 것</b>일 때가 많습니다. 말로 맞추려 하기보다 문서나 메시지로 남기면 훨씬 덜 부딪혀요.';
@@ -989,7 +1048,7 @@ const store={
 };
 const LS='zoo_v1';
 let ME=null, FRIENDS=[], GUEST=null, HOST=null, curRel='친구', curCat='all', calOffset=0, ACCOUNT=null;
-let PREVIEW_BACKUP=null, ADDING_FRIEND=false, PAY_PROMPT=null;
+let PREVIEW_BACKUP=null, ADDING_FRIEND=false, PAY_PROMPT=null, curSub='부모';
 
 function askPro(reason){
   PAY_PROMPT=reason; renderMap(); show('map');
@@ -1023,13 +1082,13 @@ const b64e=s=>btoa(String.fromCharCode(...new TextEncoder().encode(s))).replace(
 const b64d=s=>new TextDecoder().decode(Uint8Array.from(atob(s.replace(/-/g,'+').replace(/_/g,'/')),c=>c.charCodeAt(0)));
 
 function packPerson(p, withZoo){
-  const o={n:p.name,s:p.saju.stems,b:p.saju.branches,c:p.cat||null};
+  const o={n:p.name,s:p.saju.stems,b:p.saju.branches,c:p.cat||null,u:p.sub||null};
   if(withZoo) o.z=FRIENDS.map(f=>migrateCat(f.cat));
   return b64e(JSON.stringify(o));
 }
 function unpackPerson(code){
   const o=JSON.parse(b64d(code));
-  return {name:o.n, cat:o.c, zoo:o.z||null, saju:{stems:o.s,branches:o.b,hasTime:o.b[3]!==null,warn:[]}};
+  return {name:o.n, cat:o.c, sub:o.u||null, zoo:o.z||null, saju:{stems:o.s,branches:o.b,hasTime:o.b[3]!==null,warn:[]}};
 }
 
 const $=id=>document.getElementById(id);
@@ -1125,6 +1184,7 @@ function renderZoo(){
         <span style="font-weight:800;color:${EL[st.map[r]].c}">${EL[st.map[r]].e}${st.map[r]} ${v}</span>
       </div>`).join('')}</div>
     <div class="disc">신강·신약 판정은 파(派)마다 기준이 갈립니다. 월지(계절)를 얼마나 크게 볼지, 지장간까지 셀지가 다르고, 경계에 있는 사주는 전문가끼리도 답이 다릅니다. <b>참고만 해주세요.</b></div>`;
+  renderAccount(); renderPlan();     // 계정·요금제 카드는 「내 동물」 탭 아래에 산다 (2026-08-15)
   $('raw-pillars').innerHTML = ['년주','월주','일주','시주'].map((k,i)=>
     `${k} ${ganjiStr(s.stems[i],s.branches[i])}`).join(' &nbsp;·&nbsp; ');
   if(s.warn&&s.warn.length){ $('raw-warn').classList.remove('hide'); $('raw-warn').innerHTML='⚠️ '+s.warn.join('<br>⚠️ '); }
@@ -1254,7 +1314,7 @@ function renderPaywall(){
 
 function renderMap(){
   if(!ME)return;
-  renderAccount(); renderPlan(); renderPaywall();
+  renderPaywall();
   const list = FRIENDS.filter(f=>curCat==='all'||f.cat===curCat);
   $('map-sub').textContent = FRIENDS.length? `${FRIENDS.length}명이 함께 있어요` : '아직 아무도 없어요. 링크를 보내보세요';
   
@@ -1265,7 +1325,7 @@ function renderMap(){
     const ang=(-90+ i*(360/Math.max(list.length,1)))*D2R;
     const dx=Math.cos(ang), dy=Math.sin(ang);
     const x=C+R*dx, y=C+R*dy;
-    const r=compat(ME.saju,f.saju,f.cat);
+    const r=compat(ME.saju,f.saju,relOf(f));
     const col=scoreColor(r.score);
     const wdt=1.2+Math.abs(r.score-50)/13;
     // ② 중심 원(32) 밖에서 시작해 친구 원(21) 앞에서 끝난다.
@@ -1296,18 +1356,19 @@ function renderMap(){
     <text x="${C}" y="${C+52}" text-anchor="middle" font-size="11.5" fill="#3A3128" font-weight="800">${ME.name}</text>
     ${nodes}</svg>`;
   $('map-list').innerHTML = list.length? list.map(f=>{
-    const r=compat(ME.saju,f.saju,f.cat), a=ANIMALS[f.saju.branches[2]], g=gradeOf(r.score);
+    const r=compat(ME.saju,f.saju,relOf(f)), a=ANIMALS[f.saju.branches[2]], g=gradeOf(r.score);
     return `<div class="fitem" data-nm="${encodeURIComponent(f.name)}" style="cursor:pointer">
       <div class="fav" style="border-color:${CAT_COLOR[migrateCat(f.cat)]}">${a.e}</div>
-      <div><div class="nmm">${f.name} <span class="tagpill" style="background:${CAT_COLOR[migrateCat(f.cat)]}">${migrateCat(f.cat)}</span></div>
+      <div><div class="nmm">${f.name} <span class="tagpill" style="background:${CAT_COLOR[migrateCat(f.cat)]}">${f.sub?f.sub:CAT_LABEL[migrateCat(f.cat)]}</span></div>
       <div class="sub">${g.l}</div></div>
       <div class="sc" style="color:${scoreColor(r.score)}">${r.score}</div></div>`;
   }).join('') : `<div class="tiny muted center" style="padding:18px 0">초대 탭에서 링크를 복사해 친구에게 보내보세요 🔗</div>`;
   $('map-list').querySelectorAll('.fitem').forEach(el=>el.addEventListener('click',()=>{
     const nm=decodeURIComponent(el.dataset.nm);
     const f=FRIENDS.find(x=>x.name===nm); if(!f)return;
-    window.__viewFriend=f; curRel=migrateCat(f.cat);
+    window.__viewFriend=f; curRel=migrateCat(f.cat); curSub=f.sub||'부모';
     document.querySelectorAll('#seg-rel button').forEach(x=>x.classList.toggle('on',x.dataset.r===curRel));
+    document.querySelectorAll('#seg-sub button').forEach(x=>x.classList.toggle('on',x.dataset.s===curSub));
     renderMatch(); show('match');
   }));
 }
@@ -1462,13 +1523,19 @@ function renderMatch(){
   const A = GUEST? GUEST : ME;      // 지금 이 화면을 보는 사람
   const B = GUEST? HOST : (window.__viewFriend||null);
   if(!A||!B)return;
-  const r=compat(A.saju,B.saju,curRel), g=gradeOf(r.score), col=scoreColor(r.score);
+  // 가족이면 하위(부모·자식·형제)까지 보고 계산한다
+  const fam=curRel==='가족';
+  $('seg-sub').classList.toggle('hide',!fam);
+  $('sub-why').classList.toggle('hide',!fam);
+  if(fam) $('sub-why').innerHTML=SUB_WHY[curSub];
+  const relKey = fam ? '가족·'+curSub : curRel;
+  const r=compat(A.saju,B.saju,relKey), g=gradeOf(r.score), col=scoreColor(r.score);
   $('mt-who').innerHTML=`<b>${A.name}</b> 🤝 <b>${B.name}</b>`;
   // 프로 아니면 등록한 사이 말고는 잠긴 것으로 보이게
   document.querySelectorAll('#seg-rel button').forEach(x=>{
     const locked = !isPro() && !GUEST && window.__viewFriend && x.dataset.r!==migrateCat(window.__viewFriend.cat);
     x.style.opacity = locked?.5:1;
-    x.textContent = x.dataset.r + (locked?' 🔒':'');
+    x.textContent = CAT_LABEL[x.dataset.r] + (locked?' 🔒':'');
   });
   $('mt-score').innerHTML=`${r.score}<small>점</small>`;
   $('mt-score').style.color=col;
@@ -1577,7 +1644,8 @@ function renderMatch(){
   if(GUEST){
     $('mt-guest').classList.remove('hide');
     $('mt-host').textContent=HOST.name;
-    $('guest-code').textContent='ZOO-'+packPerson({name:GUEST.name,saju:GUEST.saju,cat:curRel});
+    $('guest-code').textContent='ZOO-'+packPerson({name:GUEST.name,saju:GUEST.saju,
+      cat:curRel, sub:curRel==='가족'?curSub:null});
   } else $('mt-guest').classList.add('hide');
 }
 
@@ -1688,11 +1756,13 @@ $('btn-go').addEventListener('click',()=>{
   const person={name,saju};
   if(ADDING_FRIEND){
     person.cat=document.querySelector('#seg-newcat button.on').dataset.c;
+    if(person.cat==='가족') person.sub=document.querySelector('#seg-newsub button.on').dataset.s;
     if(FRIENDS.some(f=>f.name===person.name)) FRIENDS=FRIENDS.filter(f=>f.name!==person.name);
     else if(FRIENDS.length>=capacity()){ endAddFriend(); renderMap(); show('map');
       toast('자리가 다 찼어요'); $('paywall').scrollIntoView({behavior:'smooth',block:'center'}); return; }
-    FRIENDS.push(person); save(); endAddFriend(); renderAll(); show('map');
-    toast(`${nim(person.name)}이 동물원에 들어왔어요 🐾`); return;
+    // 넣던 자리(초대 탭)에 그대로 둔다 — 관계도로 보내버리면 연달아 넣을 수가 없다 (2026-08-15)
+    FRIENDS.push(person); save(); endAddFriend(); renderAll(); show('invite');
+    toast(`${nim(person.name)}이 들어왔어요 🐾 관계도에서 볼 수 있어요`); return;
   }
   if(HOST){ GUEST=person; renderMatch(); show('match'); }
   else { ME=person; save(); renderAll(); show('zoo'); }
@@ -1705,7 +1775,7 @@ function startAddFriend(){
   $('addingFrom').innerHTML='➕ <b>친구를 직접 넣는 중이에요.</b> 이름과 생년월일을 넣으면 내 동물원에 추가됩니다.';
   $('inviteFrom').classList.add('hide');
   $('f-name').value=''; $('btn-go').textContent='내 동물원에 넣기';
-  show('input'); renderTimeUI();
+  show('input'); renderTimeUI(); newSubUI();
 }
 function endAddFriend(){
   ADDING_FRIEND=false;
@@ -1713,9 +1783,21 @@ function endAddFriend(){
   $('btn-go').textContent='내 동물 만나기';
 }
 $('btn-addself').addEventListener('click',startAddFriend);
+function newSubUI(){
+  const cat=document.querySelector('#seg-newcat button.on').dataset.c;
+  const fam=cat==='가족';
+  $('seg-newsub').classList.toggle('hide',!fam);
+  $('newsub-why').classList.toggle('hide',!fam);
+  if(fam){ const s=document.querySelector('#seg-newsub button.on').dataset.s;
+    $('newsub-why').innerHTML=SUB_WHY[s]; }
+}
 document.querySelectorAll('#seg-newcat button').forEach(b=>b.addEventListener('click',()=>{
   document.querySelectorAll('#seg-newcat button').forEach(x=>x.classList.remove('on'));
-  b.classList.add('on');
+  b.classList.add('on'); newSubUI();
+}));
+document.querySelectorAll('#seg-newsub button').forEach(b=>b.addEventListener('click',()=>{
+  document.querySelectorAll('#seg-newsub button').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on'); newSubUI();
 }));
 $('btn-edit').addEventListener('click',()=>{
   if(ME){ $('f-name').value=ME.name; $('f-date').value=ME.saju.date;
@@ -1742,7 +1824,14 @@ document.querySelectorAll('#seg-rel button').forEach(b=>b.addEventListener('clic
   }
   document.querySelectorAll('#seg-rel button').forEach(x=>x.classList.remove('on'));
   b.classList.add('on'); curRel=b.dataset.r;
-  if(window.__viewFriend&&!GUEST){ window.__viewFriend.cat=curRel; save(); }
+  if(window.__viewFriend&&!GUEST){ window.__viewFriend.cat=curRel;
+    window.__viewFriend.sub = curRel==='가족'? curSub : null; save(); }
+  renderMatch();
+}));
+document.querySelectorAll('#seg-sub button').forEach(b=>b.addEventListener('click',()=>{
+  document.querySelectorAll('#seg-sub button').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on'); curSub=b.dataset.s;
+  if(window.__viewFriend&&!GUEST){ window.__viewFriend.sub=curSub; save(); }
   renderMatch();
 }));
 document.querySelectorAll('#seg-cat button').forEach(b=>b.addEventListener('click',()=>{
@@ -1760,6 +1849,8 @@ $('cal-next').addEventListener('click',()=>moveCal(1));
 function inviteURL(){ return location.href.split('#')[0]+'#i='+packPerson(ME,true); }
 function renderInvite(){
   if(!ME)return;
+  // 내 코드 — 친구가 자기 동물원에 나를 넣을 때 쓴다 (링크와 반대 방향)
+  $('my-code').textContent='ZOO-'+packPerson(ME);
   const u=inviteURL();
   // 목업을 파일로 열면 주소가 data: URL이라 파일 전체가 링크로 보인다. 배포 후 모습으로 보여준다
   $('inv-link').textContent = /^(data|blob):/.test(u)
@@ -1788,6 +1879,10 @@ function renderPreviewBar(){
     renderPreviewBar(); renderAll(); show('invite');
   });
 }
+$('btn-copymine').addEventListener('click',async()=>{
+  try{await navigator.clipboard.writeText($('my-code').textContent);toast('내 코드를 복사했어요');}
+  catch(e){toast('길게 눌러 복사해 주세요');}
+});
 $('btn-copycode').addEventListener('click',async()=>{
   try{await navigator.clipboard.writeText($('guest-code').textContent);toast('코드를 복사했어요');}
   catch(e){toast('길게 눌러 복사해 주세요');}
@@ -1809,8 +1904,9 @@ function pasteFriend(inputId){
       $('paywall').scrollIntoView({behavior:'smooth',block:'center'}); return;
     }
     if(replacing) FRIENDS=FRIENDS.filter(f=>f.name!==p.name);
-    FRIENDS.push(p); save(); $(inputId).value=''; renderAll(); show('map');
-    toast(`${nim(p.name)}이 동물원에 들어왔어요 🐾`);
+    FRIENDS.push(p); save(); $(inputId).value=''; renderAll();
+    show(inputId==='f-paste2' ? 'invite' : 'map');    // 붙여넣은 자리에 그대로 둔다
+    toast(`${nim(p.name)}이 들어왔어요 🐾`);
   }catch(e){ toast('코드를 못 읽었어요'); }
 }
 $('btn-paste').addEventListener('click',()=>pasteFriend('f-paste'));
