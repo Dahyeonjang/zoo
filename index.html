@@ -151,6 +151,8 @@ select.inp{-webkit-appearance:none;appearance:none;padding-right:30px;
 .hblk .hr{font-size:10.5px;color:var(--sub);letter-spacing:-.03em}
 
 .hide{display:none!important}
+.backbtn{display:block;margin:12px 0 -4px;font-size:14px;font-weight:700;color:var(--sub);padding:6px 2px}
+.backbtn:active{opacity:.5}
 .center{text-align:center}
 .loop{margin-top:12px;display:grid;gap:6px}
 .lp{display:flex;align-items:flex-start;gap:9px;font-size:13px;background:#FBF7EF;border-radius:12px;padding:9px 11px;line-height:1.45}
@@ -208,6 +210,7 @@ select.inp{-webkit-appearance:none;appearance:none;padding-right:30px;
 
 <!-- ============ 0. 시작 / 입력 ============ -->
 <section id="v-input">
+  <button class="backbtn hide" id="btn-back">‹ 뒤로</button>
   <div class="card center" style="padding-top:26px">
     <div class="hidden-four" aria-label="아직 만나지 않은 동물 네 마리">
       <span>🐯</span><span>🐰</span><span>🐴</span><span>🐭</span>
@@ -431,6 +434,7 @@ select.inp{-webkit-appearance:none;appearance:none;padding-right:30px;
 
 <!-- ============ 5. 궁합 결과 ============ -->
 <section id="v-match" class="hide">
+  <button class="backbtn" id="btn-back2">‹ 뒤로</button>
   <div class="card">
     <div class="center small muted" id="mt-who">—</div>
     <div class="seg" id="seg-rel">
@@ -1105,12 +1109,34 @@ function unpackPerson(code){
 
 const $=id=>document.getElementById(id);
 const VIEWS=['input','zoo','map','luck','invite','match'];
+
+let backTarget='map', suppressPush=false, pushedDepth=0;
 function show(v){
   VIEWS.forEach(x=>$('v-'+x).classList.toggle('hide',x!==v));
   document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('on',b.dataset.v===v));
   $('nav').classList.toggle('hide', v==='input'||(v==='match'&&!ME));
+  // 처음 만드는 중이면 돌아갈 곳이 없다
+  $('btn-back').classList.toggle('hide', !(ME||GUEST));
+  if((v==='input'||v==='match') && !suppressPush){
+    try{ history.pushState({zoo:v},''); pushedDepth++; }catch(e){}
+  }
   window.scrollTo(0,0);
 }
+function goBack(){
+  if(ADDING_FRIEND) endAddFriend();
+  if(HOST && !ME){ suppressPush=true; show('input'); suppressPush=false; return; }  // 손님은 입력이 시작점
+  window.__viewFriend=null; pendingDelete=null;
+  renderAll();
+  suppressPush=true; show(backTarget); suppressPush=false;
+}
+
+function backNow(){
+  if(pushedDepth>0){ history.back(); }   // popstate가 goBack()을 부른다
+  else goBack();
+}
+$('btn-back').addEventListener('click',backNow);
+$('btn-back2').addEventListener('click',backNow);
+addEventListener('popstate',()=>{ if(pushedDepth>0)pushedDepth--; goBack(); });
 function toast(m){ const t=$('toast'); t.textContent=m; t.classList.add('on'); clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove('on'),1600); }
 
 function beastCard(saju,i,opt={}){
@@ -1402,7 +1428,7 @@ function renderMap(){
   $('map-list').querySelectorAll('.fitem[data-nm]').forEach(el=>el.addEventListener('click',()=>{
     const nm=decodeURIComponent(el.dataset.nm);
     const f=FRIENDS.find(x=>x.name===nm); if(!f)return;
-    window.__viewFriend=f; curRel=migrateCat(f.cat); curSub=f.sub||'부모';
+    window.__viewFriend=f; backTarget='map'; curRel=migrateCat(f.cat); curSub=f.sub||'부모';
     document.querySelectorAll('#seg-rel button').forEach(x=>x.classList.toggle('on',x.dataset.r===curRel));
     document.querySelectorAll('#seg-sub button').forEach(x=>x.classList.toggle('on',x.dataset.s===curSub));
     renderMatch(); show('match');
@@ -1807,7 +1833,7 @@ $('btn-go').addEventListener('click',()=>{
 });
 
 function startAddFriend(){
-  ADDING_FRIEND=true; HOST=null; GUEST=null;
+  ADDING_FRIEND=true; HOST=null; GUEST=null; backTarget='map';
   $('cat-pick').classList.remove('hide');
   $('addingFrom').classList.remove('hide');
   $('addingFrom').innerHTML='➕ <b>친구를 직접 넣는 중이에요.</b> 이름과 생년월일을 넣으면 내 동물원에 추가됩니다.';
@@ -1847,7 +1873,7 @@ $('btn-edit').addEventListener('click',()=>{
     document.querySelector(`#seg-cal button[data-t="${L?'lunar':'solar'}"]`).click();
     if(L){ $('l-y').value=L.Y; $('l-m').value=L.M; $('l-d').value=L.D; $('l-leap').checked=L.leap; updateLunarUI(); }
   }
-  HOST=null; show('input');
+  HOST=null; backTarget='zoo'; show('input');
 });
 $('btn-toinvite').addEventListener('click',()=>{renderInvite();show('invite');});
 document.querySelectorAll('#nav button').forEach(b=>b.addEventListener('click',()=>{
