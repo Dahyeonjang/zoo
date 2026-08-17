@@ -187,6 +187,11 @@ select.inp{-webkit-appearance:none;appearance:none;padding-right:30px;
 .cmp tbody td.pro{color:var(--pt)}
 .prolock{background:#FFF6EC;border:1px dashed #F0C9A6;border-radius:14px;padding:12px 13px;text-align:center;font-size:12.5px;color:#8a6a45;line-height:1.5}
 .prolock b{color:var(--pt)}
+.rsec{padding:13px 0;border-top:1px dashed var(--line)}
+.rsec:first-child{border-top:none;padding-top:4px}
+.rt{font-weight:800;font-size:14.5px;margin-bottom:6px}
+.rh{font-size:13.5px;line-height:1.65;color:var(--ink)}
+.rh .muted{color:var(--sub)}
 
 .tips{display:grid;gap:7px}
 .tip{display:flex;align-items:center;gap:11px;background:#FBF7EF;border-radius:14px;padding:10px 12px}
@@ -274,6 +279,17 @@ select.inp{-webkit-appearance:none;appearance:none;padding-right:30px;
     <div class="chkline" style="margin-top:12px"><input type="checkbox" id="f-solar" checked><label for="f-solar">진태양시 보정 (서울 기준 약 32분) — 켜기 권장</label></div>
 
     <div style="margin-top:16px"><button class="btn" id="btn-go">내 동물 만나기</button></div>
+
+    <div id="start-kakao">
+      <div style="display:flex;align-items:center;gap:10px;margin:16px 0 12px">
+        <span style="flex:1;height:1px;background:var(--line)"></span>
+        <span class="tiny muted">이미 동물원이 있다면</span>
+        <span style="flex:1;height:1px;background:var(--line)"></span>
+      </div>
+      <button class="kakao" id="btn-startkakao">카카오 계정으로 시작하기</button>
+      <p class="tiny muted" style="margin:8px 0 0">폰을 바꾸셨어도 로그인하면 <b>그대로 불러옵니다.</b>
+        <b>카카오톡과 연결되는 게 아니에요</b> — 새 비밀번호를 안 만들려고 계정만 빌려 씁니다.</p>
+    </div>
   </div>
 </section>
 
@@ -311,6 +327,11 @@ select.inp{-webkit-appearance:none;appearance:none;padding-right:30px;
     <h3 style="font-size:16px">사주 원국 <span class="tiny muted" style="font-weight:400">(궁금한 분만)</span></h3>
     <div id="raw-pillars" class="small muted" style="margin-top:8px;font-family:ui-monospace,monospace"></div>
     <div id="raw-warn" class="note hide" style="margin-top:10px"></div>
+  </div>
+
+  <div class="card" id="reading-card">
+    <h3 style="font-size:16px">내 사주 전체 풀이 <span id="read-badge"></span></h3>
+    <div id="reading-body" style="margin-top:10px"></div>
   </div>
 
   <button class="btn" id="btn-toinvite">친구는 무슨 동물일까? 초대하기</button>
@@ -1040,7 +1061,9 @@ const PAY_ENABLED = false;
 const FREE_LIMIT  = 3;            // 무료로 볼 수 있는 친구 수
 const PRICE_ONE   = 990;
 const PRICE_ALL   = 9900;
-let purchase={unlimited:false, slots:0, spent:0};
+const PRICE_READ  = 500;          // 내 사주 전체 풀이 (1회)
+let purchase={unlimited:false, slots:0, spent:0, reading:false};
+const hasReading=()=>purchase.reading||purchase.unlimited;
 let WAITLIST=null;                 // 결제가 열리기 전, 살 마음이 있는 사람을 세는 자리
 const isPro=()=>purchase.unlimited;
 
@@ -1050,6 +1073,7 @@ const PRO_FEATURES=[
   {k:'rel',     n:'같은 사람을 다른 사이로 보기', free:'등록한 사이 하나', pro:'가족·직장·친구·연인 전부'},
   {k:'both',    n:'둘 다 기운 좋은 날',  free:'—',                  pro:'✓'},
   {k:'cal',     n:'기운 달력',          free:'이번 달',            pro:'지난 달·다음 달 자유롭게'},
+  {k:'read', n:'내 사주 전체 풀이', free:'첫 조각까지', pro:'✓ (프로에 포함)'},
   {k:'cloud',   n:'계정에 저장·복원',    free:'✓',                  pro:'✓'},
 ];
 function capacity(){ return purchase.unlimited ? Infinity : FREE_LIMIT + purchase.slots; }
@@ -1134,6 +1158,21 @@ function backNow(){
   if(pushedDepth>0){ history.back(); }   // popstate가 goBack()을 부른다
   else goBack();
 }
+
+$('btn-startkakao').addEventListener('click',()=>{
+  const name=($('f-name').value||'').trim();
+  const id='kakao_'+(name||'me');
+  const saved=cloudPull(id);
+  ACCOUNT={id, name:name||(saved&&saved.me?saved.me.name:'나'), at:new Date().toISOString()};
+  if(saved&&saved.me){
+    ME=saved.me; FRIENDS=saved.friends||[]; purchase=saved.purchase||purchase;
+    saveLocal(); renderAll(); show('zoo');
+    toast(`${nim(ME.name)}의 동물원을 되찾았어요 · 친구 ${FRIENDS.length}명`);
+  }else{
+    saveLocal(); renderAll();
+    toast('저장된 동물원이 없어요 — 아래에 생년월일을 넣어주세요');
+  }
+});
 $('btn-back').addEventListener('click',backNow);
 $('btn-back2').addEventListener('click',backNow);
 addEventListener('popstate',()=>{ if(pushedDepth>0)pushedDepth--; goBack(); });
@@ -1222,11 +1261,45 @@ function renderZoo(){
         <span style="font-weight:800;color:${EL[st.map[r]].c}">${EL[st.map[r]].e}${st.map[r]} ${v}</span>
       </div>`).join('')}</div>
     <div class="disc">신강·신약 판정은 파(派)마다 기준이 갈립니다. 월지(계절)를 얼마나 크게 볼지, 지장간까지 셀지가 다르고, 경계에 있는 사주는 전문가끼리도 답이 다릅니다. <b>참고만 해주세요.</b></div>`;
+  renderReading(s, ME.name);
   renderAccount(); renderPlan();     // 계정·요금제 카드는 「내 동물」 탭 아래에 산다 (2026-08-15)
   $('raw-pillars').innerHTML = ['년주','월주','일주','시주'].map((k,i)=>
     `${k} ${ganjiStr(s.stems[i],s.branches[i])}`).join(' &nbsp;·&nbsp; ');
   if(s.warn&&s.warn.length){ $('raw-warn').classList.remove('hide'); $('raw-warn').innerHTML='⚠️ '+s.warn.join('<br>⚠️ '); }
   else $('raw-warn').classList.add('hide');
+}
+
+function renderReading(saju,name){
+  const secs=readingOf(saju,name);
+  const box=$('reading-body');
+  $('read-badge').innerHTML = hasReading()
+    ? '<span class="tagpill" style="background:var(--good)">열림</span>' : '';
+  if(hasReading()){
+    box.innerHTML=secs.map(s=>`<div class="rsec">
+      <div class="rt">${s.e} ${s.t}</div><div class="rh">${s.h}</div></div>`).join('');
+    return;
+  }
+  // 잠긴 상태 — 첫 조각은 진짜로 보여주고 나머지는 흐리게. 뭘 사는지 알고 사게 한다
+  const first=secs[0], rest=secs.slice(1);
+  box.innerHTML=`<div class="rsec"><div class="rt">${first.e} ${first.t}</div><div class="rh">${first.h}</div></div>
+    <div style="position:relative">
+      <div style="filter:blur(4.5px);pointer-events:none;user-select:none" aria-hidden="true">
+        ${rest.map(s=>`<div class="rsec"><div class="rt">${s.e} ${s.t}</div>
+          <div class="rh">${s.h.replace(/<[^>]+>/g,'').slice(0,90)}…</div></div>`).join('')}
+      </div>
+      <div style="position:absolute;inset:0;background:linear-gradient(180deg,transparent,var(--card) 65%)"></div>
+    </div>
+    <div class="prolock" style="margin-top:-6px">
+      <b>${rest.length}개의 이야기</b>가 더 있어요 —
+      곁에 두면 힘이 나는 동물 친구 · 오래 붙어 있으면 지치는 결 · 네 마리와 걷는 인생 여행 · 올해의 동물 친구
+    </div>
+    <button class="plan best" id="buy-read" ${PAY_ENABLED?'':'disabled'} style="margin-top:10px">
+      <span class="pt"><span class="pn">전체 풀이 열기</span><br><span class="pd">한 번 사면 계속 볼 수 있어요</span></span>
+      <span class="pp">${PRICE_READ.toLocaleString()}원</span></button>
+    ${PAY_ENABLED?'':`<div style="margin-top:8px"><button class="btn sm ghost" id="mock-read">500원 산 셈 (목업)</button></div>`}`;
+  const buy=()=>{ purchase.reading=true; purchase.spent+=PRICE_READ; save(); renderAll();
+    toast('전체 풀이가 열렸어요 🐾'); $('reading-card').scrollIntoView({behavior:'smooth',block:'start'}); };
+  ['buy-read','mock-read'].forEach(id=>$(id)&&$(id).addEventListener('click',buy));
 }
 
 function renderAccount(){
@@ -1506,6 +1579,65 @@ function renderLuck(){
   const worst=[...scored].sort((x,y)=>x.score-y.score).slice(0,2);
   $('cal-best').innerHTML=`<b>기운 좋은 날</b> ${best.map(b=>`${M}/${b.d} ${b.a.e}`).join(' · ')}<br>
     <span class="muted">조심할 날</span> ${worst.map(b=>`${M}/${b.d} ${b.a.e}`).join(' · ')}`;
+}
+
+const EL_ANIMALS={목:[2,3],화:[5,6],토:[1,4,7,10],금:[8,9],수:[0,11]};
+const animalsOf=e=>EL_ANIMALS[e].map(b=>ANIMALS[b]);
+function readingOf(saju,name){
+  const st=strength(saju), c=ohaeng(saju);
+  const four=[0,1,2,3].map(i=>saju.branches[i]===null?null:ANIMALS[saju.branches[i]]);
+  const me=four[2];
+  const secs=[];
+
+  // ① 네 마리가 모이면
+  const 있는=four.filter(Boolean);
+  secs.push({t:'네 마리가 모이면', e:'🫂', h:
+    `${nim(name)} 곁엔 ${있는.map(a=>a.e).join('')} <b>${있는.length}마리</b>가 있어요.
+     그중 <b>${me.n}</b>${josa(me.n,'이','가')} 제일 가까이 붙어 다닙니다 — ${me.t}<br><br>
+     밖에서는 <b>${four[0].n}</b>${josa(four[0].n,'이','가')} 먼저 나서고, 뭔가 해내야 할 땐 <b>${four[1].n}</b>${josa(four[1].n,'이','가')} 앞에 섭니다.
+     ${four[3]?`나이가 들수록 <b>${four[3].n}</b>${josa(four[3].n,'이','가')} 슬슬 고개를 내밀고요.`
+       :`네 번째 친구는 아직 안 나타났어요 — 태어난 시간을 알면 만날 수 있습니다.`}`});
+
+  // ② 나를 밀어주는 동물 친구
+  const good=st.good.length?st.good:ELEMENTS.filter(e=>c[e]===0);
+  const goodA=good.flatMap(animalsOf);
+  secs.push({t:'곁에 두면 힘이 나는 친구', e:'🌱', h:
+    `${nim(name)}${josa(nim(name),'은','는')} <b>${st.kind}</b>${josa(st.kind,'이라','라')}
+     ${st.kind==='신강'?'혼자 힘이 넘치는 편이에요. 그래서 <b>그 힘을 꺼내 쓰게 해주는</b>':
+       st.kind==='신약'?'혼자 다 짊어지면 쉽게 지쳐요. 그래서 <b>옆에서 받쳐주는</b>':'어느 쪽으로도 안 치우쳐요. 그래서 <b>비어 있는 자리를 채워주는</b>'}
+     친구가 좋습니다.<br><br>
+     ${goodA.map(a=>a.e+'<b>'+a.n+'</b>').join(' · ')}<br>
+     <span class="muted">이 친구들 곁에 있으면 일이 잘 풀리고 기분이 가벼워져요.</span>`});
+
+  // ③ 조심할 결 — 판정이 아니라 다루는 법
+  const bad=st.bad.filter(e=>c[e]>=2);
+  if(bad.length){
+    const badA=bad.flatMap(animalsOf);
+    secs.push({t:'오래 붙어 있으면 지치는 결', e:'🌀', h:
+      `${badA.map(a=>a.e+'<b>'+a.n+'</b>').join(' · ')}<br><br>
+       이미 ${nim(name)}에게 <b>넘치는 기운</b>이라, 같은 결이 더 쌓이면 무거워져요.
+       <b>나쁜 친구라는 뜻이 아닙니다</b> — 같이 있으면 신나는데 <b>둘 다 못 멈추는</b> 쪽이에요.
+       가끔 보면 제일 즐거운 사이입니다.`});
+  }
+
+  // ④ 인생을 네 구간으로 걷는다
+  const 구간=[['0~15세','태어나서 자라는 동안'],['16~30세','배우고 일을 익히는 동안'],
+             ['31~45세','제일 나다운 시절'],['46세~','천천히 익어가는 시절']];
+  secs.push({t:'네 마리와 걷는 여행', e:'🗺️', h:
+    구간.map((g,i)=>four[i]
+      ? `<b>${g[0]}</b> ${four[i].e} ${g[1]} — ${four[i].t}`
+      : `<b>${g[0]}</b> ❔ 아직 안 나타난 친구예요`).join('<br>')
+    + `<br><br><span class="muted">한 마리가 평생 앞장서는 게 아니라, 시기마다 앞에 서는 친구가 바뀝니다.</span>`});
+
+  // ⑤ 올해의 동물 친구
+  const Y=new Date().getFullYear(), yi=((Y-4)%60+60)%60, ya=ANIMALS[yi%12];
+  const yl=luckScore(saju,yi%12,yi%10);
+  secs.push({t:`${Y}년 나의 동물 친구`, e:'📅', h:
+    `올해는 ${ya.e}<b>${ya.n}의 해</b>예요. ${nim(name)}과의 궁합은 <b style="color:${scoreColor(yl.score)}">${yl.score}점</b>.<br><br>
+     ${yl.score>=62?'올해 이 친구가 등을 밀어줍니다. 미뤄둔 걸 꺼내기 좋은 해예요.'
+      :yl.score<=44?'올해는 이 친구와 발이 살짝 안 맞아요. 크게 벌이기보다 <b>고르는 해</b>로 두면 편합니다.'
+      :'무난히 같이 걷는 해예요. 큰 파도도 큰 바람도 없습니다.'}`});
+  return secs;
 }
 
 const DAY_ADVICE={
