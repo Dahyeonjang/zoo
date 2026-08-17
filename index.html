@@ -348,6 +348,10 @@ select.inp{-webkit-appearance:none;appearance:none;padding-right:30px;
     </button>
     <div id="plan-body" class="hide" style="margin-top:10px"></div>
   </div>
+
+  <p class="center tiny" style="color:#C4B8A6;margin:0 0 10px">
+    동물원 <span id="app-ver"></span> · <button id="btn-refresh" style="text-decoration:underline;color:inherit;font-size:inherit">최신으로 새로고침</button>
+  </p>
 </section>
 
 <!-- ============ 2. 관계도 ============ -->
@@ -1057,6 +1061,7 @@ function luckScore(me, br, st){
   return {score:Math.max(5,Math.min(98,Math.round(50+avg*3.6+stemTerm))), best, stemNote};
 }
 
+const APP_VER = '2026-08-15 · 8';
 const PAY_ENABLED = false;
 const FREE_LIMIT  = 3;            // 무료로 볼 수 있는 친구 수
 const PRICE_ONE   = 990;
@@ -1159,6 +1164,10 @@ function backNow(){
   else goBack();
 }
 
+$('app-ver').textContent=APP_VER;
+$('btn-refresh').addEventListener('click',()=>{
+  location.replace(location.href.split('#')[0].split('?')[0]+'?v='+Date.now());
+});
 $('btn-startkakao').addEventListener('click',()=>{
   const name=($('f-name').value||'').trim();
   const id='kakao_'+(name||'me');
