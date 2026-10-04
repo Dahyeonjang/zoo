@@ -3,17 +3,24 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>동물원 — 나와 함께 걷는 네 마리</title>
+<title>사주동물원 — 나와 함께 걷는 네 마리</title>
+<!-- 홈 화면에 두기 (2026-10-04) — 모여셈과 같은 짝: manifest + 아이콘 + 서비스워커 + iOS 메타 -->
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#F0885A">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="사주동물원">
 <style>
 :root{
   --bg:#FBF7EF; --card:#FFFFFF; --ink:#3A3128; --sub:#8B7E6D; --line:#EDE4D4;
-  --pt:#F0885A;            
+  --pt:#F0885A;            /* 포인트 주황 */
   --good:#5FA86E; --bad:#D9705F; --mid:#C9A227;
   --fam:#6FA8DC; --acq:#8FBF7F; --lov:#E8899E; --wrk:#A98FD0;
   --shadow:0 2px 10px rgba(122,100,70,.08);
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-
+/* 버튼·입력칸에서 더블탭 확대가 튀지 않게. 본문 핀치 확대는 그대로 둔다 (2026-08-15) */
 button,.seg button,.hblk,.plan,.fitem,input,select,label{touch-action:manipulation}
 html,body{margin:0;padding:0}
 body{
@@ -26,6 +33,7 @@ h1,h2,h3{margin:0;font-weight:800;letter-spacing:-.02em}
 button{font-family:inherit;font-size:inherit;cursor:pointer;border:none;background:none;color:inherit}
 input,select{font-family:inherit;font-size:16px}
 
+/* ---------- 헤더 ---------- */
 #preview-bar{position:sticky;top:0;z-index:40;background:#3A3128;color:#fff;font-size:12.5px;
   padding:9px 16px;display:flex;align-items:center;gap:10px;justify-content:center;flex-wrap:wrap}
 #preview-bar button{background:rgba(255,255,255,.18);color:#fff;font-weight:700;font-size:12px;
@@ -37,6 +45,7 @@ input,select{font-family:inherit;font-size:16px}
 .logo span{color:var(--pt)}
 .todaychip{margin-left:auto;font-size:12px;background:#fff;border:1px solid var(--line);border-radius:999px;padding:5px 11px;box-shadow:var(--shadow);white-space:nowrap}
 
+/* ---------- 공통 ---------- */
 .card{background:var(--card);border-radius:20px;padding:18px;box-shadow:var(--shadow);margin:14px 0}
 .muted{color:var(--sub)}
 .small{font-size:13px}
@@ -51,7 +60,7 @@ label.fld{display:block;margin:14px 0 6px;font-weight:700;font-size:13.5px}
 .inp{width:100%;padding:13px 14px;border:1.5px solid var(--line);border-radius:14px;background:#fff;color:var(--ink);
   min-height:50px;line-height:1.2}
 .inp:focus{outline:none;border-color:var(--pt)}
-
+/* 날짜·시간 칸은 브라우저 기본 모양이 제각각이라 높이가 안 맞는다. 직접 맞춘다 (2026-08-15) */
 input[type="date"],input[type="time"]{-webkit-appearance:none;appearance:none;
   display:block;width:100%;font-variant-numeric:tabular-nums}
 input[type="date"]::-webkit-date-and-time-value,
@@ -65,6 +74,7 @@ select.inp{-webkit-appearance:none;appearance:none;padding-right:30px;
 .chkline input{width:17px;height:17px;accent-color:var(--pt)}
 .note{background:#FFF6EC;border:1px solid #F6E0C8;border-radius:14px;padding:11px 13px;font-size:12.5px;color:#8a6a45;line-height:1.55}
 
+/* 아직 만나지 않은 네 마리 — 실루엣으로만. brightness(0)이 이모지를 검은 형태로 만든다 */
 .hidden-four{display:flex;justify-content:center;gap:6px}
 .hidden-four span{font-size:42px;line-height:1;filter:brightness(0);opacity:.16;
   animation:breathe 3.4s ease-in-out infinite}
@@ -74,8 +84,10 @@ select.inp{-webkit-appearance:none;appearance:none;padding-right:30px;
 @keyframes breathe{0%,100%{opacity:.13;transform:translateY(0)}50%{opacity:.26;transform:translateY(-3px)}}
 @media (prefers-reduced-motion:reduce){.hidden-four span{animation:none;opacity:.18}}
 
+/* ---------- 동물 ---------- */
 .zoo{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
-.beast{background:#fff;border:1.5px solid var(--line);border-radius:18px;padding:13px 7px;text-align:center;position:relative;overflow:hidden}
+.beast{background:#fff;border:1.5px solid var(--line);border-radius:18px;padding:13px 7px;text-align:center;position:relative;overflow:hidden;
+  word-break:keep-all}   /* 좁은 칸에서 「아직 안 나/타났어요」처럼 낱말 가운데가 끊기던 것 (2026-10-04) */
 .beast.hero{grid-column:1/-1;background:linear-gradient(160deg,#FFF3E7,#FFF9F2);border-color:#F6DCC2}
 .beast .face{font-size:32px;line-height:1;display:block;margin-bottom:5px}
 .beast.hero .face{font-size:58px}
@@ -89,6 +101,7 @@ select.inp{-webkit-appearance:none;appearance:none;padding-right:30px;
 .beast.empty{background:#FAF6EF;border-style:dashed;color:var(--sub)}
 .beast.empty .face{opacity:.35;filter:grayscale(1)}
 
+/* ---------- 점수 ---------- */
 .scorebig{text-align:center;padding:6px 0 2px}
 .scorebig .n{font-size:60px;font-weight:900;letter-spacing:-.05em;line-height:1}
 .scorebig .n small{font-size:20px;font-weight:800;color:var(--sub)}
@@ -96,6 +109,7 @@ select.inp{-webkit-appearance:none;appearance:none;padding-right:30px;
 .bar{height:9px;border-radius:99px;background:#F0E9DC;overflow:hidden;margin:14px 0 4px}
 .bar>i{display:block;height:100%;border-radius:99px}
 
+/* ---------- 만남 목록 ---------- */
 .meet{display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px dashed var(--line)}
 .meet:first-of-type{border-top:none}
 .meet .pair{font-size:22px;white-space:nowrap;letter-spacing:-2px}
@@ -104,16 +118,19 @@ select.inp{-webkit-appearance:none;appearance:none;padding-right:30px;
 .meet .t2{font-size:12px;color:var(--sub);line-height:1.4}
 .meet .sc{font-weight:800;font-size:13px;white-space:nowrap}
 
+/* ---------- 탭 ---------- */
 .seg{display:flex;background:#F2EADF;border-radius:14px;padding:4px;gap:4px;margin:12px 0}
 .seg button{flex:1;padding:9px 0;border-radius:11px;font-size:13.5px;font-weight:700;color:var(--sub)}
 .seg button.on{background:#fff;color:var(--ink);box-shadow:var(--shadow)}
 
+/* ---------- 하단 네비 ---------- */
 .nav{position:fixed;bottom:0;left:0;right:0;background:rgba(255,255,255,.96);backdrop-filter:blur(8px);border-top:1px solid var(--line);z-index:30}
 .nav .wrap{display:flex;height:62px}
 .nav button{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:10.5px;color:var(--sub);font-weight:600}
 .nav button .ic{font-size:20px;line-height:1}
 .nav button.on{color:var(--pt)}
 
+/* ---------- 관계도 ---------- */
 .legend{display:flex;gap:12px;justify-content:center;font-size:12px;color:var(--sub);margin-top:8px}
 .legend i{display:inline-block;width:9px;height:9px;border-radius:99px;margin-right:4px;vertical-align:middle}
 .flist{margin-top:6px}
@@ -130,6 +147,7 @@ select.inp{-webkit-appearance:none;appearance:none;padding-right:30px;
 .delbtn.no{background:#fff;border:1.5px solid var(--line);color:var(--sub)}
 .delbtn.yes{background:var(--bad);color:#fff}
 
+/* ---------- 달력 ---------- */
 .cal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-top:10px}
 .cal .dow{text-align:center;font-size:11px;color:var(--sub);font-weight:700;padding:4px 0}
 .cell{aspect-ratio:1;border-radius:11px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:11px;border:1px solid transparent;position:relative}
@@ -143,6 +161,7 @@ select.inp{-webkit-appearance:none;appearance:none;padding-right:30px;
 .mchip .me{font-size:18px;line-height:1.2}
 .mchip .ms{font-size:11px;font-weight:800}
 
+/* ---------- 시간대 블록 ---------- */
 .hblocks{display:grid;grid-template-columns:repeat(2,1fr);gap:7px}
 .hblk{display:flex;align-items:center;gap:9px;border:1.5px solid var(--line);background:#fff;border-radius:14px;padding:10px 9px;text-align:left}
 .hblk.on{border-color:var(--pt);background:#FFF3E7}
@@ -150,6 +169,7 @@ select.inp{-webkit-appearance:none;appearance:none;padding-right:30px;
 .hblk .hn{font-weight:800;font-size:13px}
 .hblk .hr{font-size:10.5px;color:var(--sub);letter-spacing:-.03em}
 
+/* ---------- 기타 ---------- */
 .hide{display:none!important}
 .backbtn{display:block;margin:12px 0 -4px;font-size:14px;font-weight:700;color:var(--sub);padding:6px 2px}
 .backbtn:active{opacity:.5}
@@ -163,6 +183,7 @@ select.inp{-webkit-appearance:none;appearance:none;padding-right:30px;
 .hr{height:1px;background:var(--line);margin:16px 0}
 .tagpill{display:inline-block;font-size:11px;font-weight:700;border-radius:999px;padding:3px 9px;color:#fff}
 
+/* ---------- 결제 / 계정 ---------- */
 .capchip{margin-left:auto;font-size:11.5px;font-weight:700;background:#F2EADF;color:var(--sub);border-radius:999px;padding:4px 10px;white-space:nowrap}
 .capchip.full{background:#FFF0E4;color:var(--pt)}
 .capchip.pro{background:linear-gradient(135deg,#F0885A,#E8899E);color:#fff}
@@ -193,12 +214,25 @@ select.inp{-webkit-appearance:none;appearance:none;padding-right:30px;
 .rh{font-size:13.5px;line-height:1.65;color:var(--ink)}
 .rh .muted{color:var(--sub)}
 
+/* ---------- 오늘의 추천 ---------- */
 .tips{display:grid;gap:7px}
 .tip{display:flex;align-items:center;gap:11px;background:#FBF7EF;border-radius:14px;padding:10px 12px}
 .tip .te{font-size:21px;line-height:1;width:26px;text-align:center;flex-shrink:0}
 .tip .tl{font-size:10.5px;color:var(--sub);font-weight:700}
 .tip .tv{font-size:13.5px;font-weight:700;line-height:1.35}
 
+/* ---------- 홈 화면에 두기 (2026-10-04) ---------- */
+.a2hs{display:flex;align-items:flex-start;gap:11px;padding:14px 14px 14px 16px}
+.a2hs .ai{width:40px;height:40px;border-radius:11px;flex-shrink:0;display:block}
+.a2hs .ab{flex:1;min-width:0}
+.a2hs .at{font-weight:800;font-size:14.5px;letter-spacing:-.02em}
+.a2hs .ad{font-size:12.5px;color:var(--sub);line-height:1.5;margin-top:2px;word-break:keep-all}
+.a2hs ol{margin:8px 0 0;padding-left:18px;font-size:13px;line-height:1.7}
+.a2hs .acts{display:flex;gap:7px;margin-top:10px;flex-wrap:wrap}
+.a2hs .acts .btn{width:auto;flex:1;min-width:120px}
+.a2hs .ax{flex-shrink:0;width:28px;height:28px;border-radius:99px;color:#C4B8A6;font-size:14px;margin:-4px -4px 0 0}
+
+/* ---------- 참고 문구 (작게) ---------- */
 .disc{margin-top:12px;padding-top:10px;border-top:1px solid var(--line);
   font-size:11px;line-height:1.5;color:#A99C8A;letter-spacing:-.02em}
 </style>
@@ -304,6 +338,9 @@ select.inp{-webkit-appearance:none;appearance:none;padding-right:30px;
     <div class="zoo" id="zoo-grid"></div>
   </div>
 
+  <!-- 홈 화면에 두기 — 내 네 마리를 본 바로 다음 자리. 닫으면 다시 안 뜬다 (2026-10-04) -->
+  <div class="card a2hs hide" id="a2hs-card"></div>
+
   <div class="card">
     <h3 style="font-size:16px">이 네 마리는 무엇인가요</h3>
     <p class="small muted" style="margin:8px 0 0">태어난 <b>해·달·날·시</b>마다 동물이 한 마리씩 있어요. 그래서 누구나 네 마리예요.<br><br>
@@ -350,7 +387,8 @@ select.inp{-webkit-appearance:none;appearance:none;padding-right:30px;
   </div>
 
   <p class="center tiny" style="color:#C4B8A6;margin:0 0 10px">
-    동물원 <span id="app-ver"></span> · <button id="btn-refresh" style="text-decoration:underline;color:inherit;font-size:inherit">최신으로 새로고침</button>
+    사주동물원 <span id="app-ver"></span> · <button id="btn-refresh" style="text-decoration:underline;color:inherit;font-size:inherit">최신으로 새로고침</button>
+    <span id="a2hs-linkwrap"> · <button id="btn-a2hs-link" style="text-decoration:underline;color:inherit;font-size:inherit">홈 화면에 두는 법</button></span>
   </p>
 </section>
 
@@ -384,16 +422,27 @@ select.inp{-webkit-appearance:none;appearance:none;padding-right:30px;
   <div class="card">
     <h3 style="font-size:16px">친구 넣기</h3>
 
-    <p class="small" style="margin:11px 0 6px"><b>생년월일을 이미 알고 있다면</b></p>
+    <p class="small" style="margin:11px 0 6px"><b>친구에게 직접 입력 부탁하기</b></p>
+    <p class="tiny muted" style="margin:0 0 9px">링크를 보내면 친구가 자기 생일을 넣어요. 그러면 친구 화면에 <b>회신 링크</b>가 뜨는데, 그것만 눌러주면 바로 들어옵니다.</p>
+    <button class="btn sm" id="btn-askfriend">링크 복사해서 보내기</button>
+
+    <div class="hr" style="margin:15px 0"></div>
+
+    <p class="small" style="margin:0 0 6px"><b>생년월일을 이미 알고 있다면</b></p>
     <p class="tiny muted" style="margin:0 0 9px">가족처럼 아는 생일은 직접 넣어도 됩니다.</p>
     <button class="btn sm ghost" id="btn-addself">내가 직접 입력하기</button>
 
     <div class="hr" style="margin:15px 0"></div>
 
-    <p class="small" style="margin:0 0 6px"><b>친구가 코드를 보내줬다면</b></p>
-    <p class="tiny muted" style="margin:0 0 9px">친구가 내 링크로 궁합을 본 뒤 보내준 코드예요.</p>
-    <input class="inp" id="f-paste" placeholder="ZOO-... 코드 붙여넣기">
-    <div style="margin-top:8px"><button class="btn sm ghost" id="btn-paste">동물원에 넣기</button></div>
+    <button id="btn-paste-toggle" style="width:100%;display:flex;align-items:center;gap:8px;text-align:left">
+      <span style="font-weight:700;font-size:14px">친구가 코드를 보내줬다면</span>
+      <span id="paste-arrow" style="margin-left:auto;color:var(--sub)">▾</span>
+    </button>
+    <div id="paste-body" class="hide" style="margin-top:10px">
+      <p class="tiny muted" style="margin:0 0 9px">회신 링크가 안 눌릴 때 친구가 대신 보내주는 ZOO- 코드를 넣는 자리예요.</p>
+      <input class="inp" id="f-paste" placeholder="ZOO-... 코드 붙여넣기">
+      <div style="margin-top:8px"><button class="btn sm ghost" id="btn-paste">동물원에 넣기</button></div>
+    </div>
   </div>
 </section>
 
@@ -515,9 +564,14 @@ select.inp{-webkit-appearance:none;appearance:none;padding-right:30px;
 
   <div id="mt-guest" class="card hide">
     <h3 style="font-size:16px">이 결과를 <span id="mt-host">친구</span>님 동물원에 보낼까요?</h3>
-    <p class="tiny muted" style="margin:6px 0 10px">아래 코드를 복사해서 카톡으로 보내주면 돼요. 자동으로 전송되는 건 없습니다.</p>
-    <div class="copybox" id="guest-code"></div>
-    <div style="margin-top:10px"><button class="btn sm" id="btn-copycode">코드 복사</button></div>
+    <p class="tiny muted" style="margin:6px 0 10px">아래 <b>회신 링크</b>를 복사해서 카톡으로 보내주면 돼요. <b><span id="mt-host2">친구</span>님이 그 링크를 누르면 바로 들어갑니다</b> — 따로 붙여넣을 게 없어요. 자동으로 전송되는 건 없습니다.</p>
+    <div class="copybox" id="guest-link"></div>
+    <div style="margin-top:10px"><button class="btn sm" id="btn-copyback">회신 링크 복사</button></div>
+    <div style="margin-top:10px"><button id="btn-gcode-toggle" class="tiny" style="color:#B4A896;text-decoration:underline">링크가 안 눌리면 코드로 보내기 <span id="gcode-arrow">▾</span></button></div>
+    <div id="gcode-body" class="hide" style="margin-top:8px">
+      <div class="copybox" id="guest-code"></div>
+      <div style="margin-top:10px"><button class="btn sm ghost" id="btn-copycode">코드 복사</button></div>
+    </div>
     <div class="hr"></div>
     <button class="btn ghost" id="btn-mine">나도 내 동물 네 마리 보기</button>
   </div>
@@ -535,11 +589,16 @@ select.inp{-webkit-appearance:none;appearance:none;padding-right:30px;
 <div class="toast" id="toast"></div>
 
 <script>
-
+/* =====================================================================
+   사주동물원 — 사주 계산 엔진
+   검증: 2000-01-01→무오일, 1900-01-01→갑술일 (100년 떨어진 두 기준점 일치)
+        2025 입춘 23:09(실제 23:10), 2024 동지 18:14(실제 18:21)
+   ===================================================================== */
 const D2R = Math.PI/180;
 const STEMS = ['갑','을','병','정','무','기','경','신','임','계'];
 const BRANCHES = ['자','축','인','묘','진','사','오','미','신','유','술','해'];
-
+/* 설명은 초등학생도 알아듣게 쓴다 — 멋있는 말 말고 눈에 보이는 행동으로.
+   '크게 그리는' 같은 말은 예뻐 보이지만 무슨 뜻인지 아무도 모른다 (2026-08-14 다현님) */
 const ANIMALS = [
  {n:'쥐',    e:'🐭', o:'수', t:'빨리 알아채고 잘 모아둬요'},
  {n:'소',    e:'🐮', o:'토', t:'느리지만 끝까지 해내요'},
@@ -554,7 +613,8 @@ const ANIMALS = [
  {n:'개',    e:'🐶', o:'토', t:'내 편은 끝까지 지켜줘요'},
  {n:'돼지',  e:'🐷', o:'수', t:'잘 나눠주고 사람을 잘 믿어요'},
 ];
-
+/* 동물마다 오늘 가까이할 것. 고기로만 하면 절반이 안 나온다(쥐·용·뱀은 못 먹는다)
+   — 그 동물이 떠올리게 하는 것으로 간다 */
 const TIP = [
  {food:['김밥','견과류','치즈'],        item:'작은 파우치',      color:'검정·남색'},  // 쥐 水
  {food:['소고기국밥','곰탕','우유'],     item:'튼튼한 가죽 소품',  color:'노랑·베이지'},// 소 土
@@ -571,6 +631,8 @@ const TIP = [
 ];
 const YUKHAP_OF = b => (YUKHAP.find(p=>p.includes(b))||[]).find(x=>x!==b);
 
+/* k는 사주 용어(년·월·일·시)라 그대로 쓰면 '일의 동물'이 '일(work)의 동물'로 읽힌다.
+   화면에는 plain을 쓰고, k는 원국 표시 같은 기술적인 자리에만 남긴다 */
 const PILLAR_META = [
   {k:'년', plain:'태어난 해',   title:'남들이 먼저 보는 동물',    sub:'처음 만난 사람한테 보이는 나예요'},
   {k:'월', plain:'태어난 달',   title:'뭔가 해낼 때 나오는 동물', sub:'학교나 회사에서 일할 때의 나예요'},
@@ -578,13 +640,15 @@ const PILLAR_META = [
   {k:'시', plain:'태어난 시간', title:'나중에 나오는 동물',       sub:'지금은 잘 안 보이는데 나이 들수록 커져요'},
 ];
 
+/* ---------- 조사 (용→용과, 쥐→쥐와) ---------- */
 function hasJong(s){ const c=s.charCodeAt(s.length-1); if(c<0xAC00||c>0xD7A3)return false; return (c-0xAC00)%28!==0; }
 const 와과=s=>s+(hasJong(s)?'과':'와');
 const 은는=s=>s+(hasJong(s)?'은':'는');
 const josa=(s,withJong,without)=>hasJong(s)?withJong:without;   // josa('용','과','와') → '과'
-
+/* 이름에 '님'을 붙인다. 이미 '님'으로 끝나면 안 붙인다 — "팀장님님"이 나왔다 (2026-08-14) */
 const nim=s=>{ s=(s||'').trim(); return /[님씨]$/.test(s)? s : s+'님'; };
 
+/* ---------- 율리우스일 ---------- */
 function jdn(y,m,d){
   const a=Math.floor((14-m)/12), yy=y+4800-a, mm=m+12*a-3;
   return d+Math.floor((153*mm+2)/5)+365*yy+Math.floor(yy/4)-Math.floor(yy/100)+Math.floor(yy/400)-32045;
@@ -595,7 +659,8 @@ function jdnToYMD(J){
   let d=Math.floor((4*c+3)/1461), e=c-Math.floor(1461*d/4), m=Math.floor((5*e+2)/153);
   return {y:100*b+d-4800+Math.floor(m/10), m:m+3-12*Math.floor(m/10), d:e-Math.floor((153*m+2)/5)+1};
 }
-
+/* ΔT — 역학시(TD)와 세계시(UT)의 차이(초). Meeus의 절기·삭 공식은 TD를 준다.
+   약 1분짜리 차이지만, 삭이 자정 근처면 음력 날짜가 하루 통째로 바뀔 수 있는 자리다. */
 function deltaT(y){
   let t;
   if(y<1920){ t=y-1900; return -2.79+1.494119*t-0.0598939*t*t+0.0061966*t**3-0.000197*t**4; }
@@ -607,6 +672,7 @@ function deltaT(y){
 }
 const tdToUT=jde=>jde-deltaT(jdnToYMD(Math.floor(jde+0.5)).y)/86400;
 
+/* ---------- 태양 겉보기황경 ---------- */
 function sunLon(jd){
   const T=(jd-2451545)/36525;
   const L0=280.46646+36000.76983*T+0.0003032*T*T;
@@ -626,7 +692,7 @@ function solveLon(target,guess){
   }
   return tdToUT(jd);
 }
-
+/* 12절 — 월의 경계 */
 const JEOL=[
  {n:'입춘',lon:315,br:2,gm:2},{n:'경칩',lon:345,br:3,gm:3},{n:'청명',lon:15,br:4,gm:4},
  {n:'입하',lon:45,br:5,gm:5},{n:'망종',lon:75,br:6,gm:6},{n:'소서',lon:105,br:7,gm:7},
@@ -640,6 +706,12 @@ function jeolOf(year){
   _jeolCache[year]=r; return r;
 }
 
+/* =====================================================================
+   한국 음력 (KASI 방식) — 한국시 기준 삭 + 무중치윤법
+   검증(2026-08-14): 설날 9건·추석 7건·윤달 10건 = 26건 일치.
+   남은 2건(1988·2027 설날)은 삭이 한국 자정 뒤 54분·중국 자정 6분 전에 있는 날로,
+   한국 음력과 중국 농력이 실제로 갈리는 자리다. 계산 오류가 아니다.
+   ===================================================================== */
 function newMoonJD(k){
   const T=k/1236.85, T2=T*T, T3=T2*T, T4=T3*T;
   let jde = 2451550.09766 + 29.530588861*k + 0.00015437*T2 - 0.000000150*T3 + 0.00000000073*T4;
@@ -666,7 +738,8 @@ function newMoonJD(k){
   return tdToUT(jde);
 }
 const KSTh=9/24;
-
+/* 음력 달의 경계는 삭 '순간'이 아니라 삭이 든 한국 날짜의 자정이다.
+   이걸 순간으로 잡았더니 윤달이 통째로 한 달씩 밀렸다 (2026-08-14) */
 function nmDayNum(k){ return Math.floor(newMoonJD(k)+0.5+KSTh); }
 function monthStartJD(k){ return nmDayNum(k)-0.5-KSTh; }
 function lastNewMoonK(jd){
@@ -722,6 +795,7 @@ function lunarToSolar(Y,M,D,leap){
   return {ymd:`${p.y}-${String(p.m).padStart(2,'0')}-${String(p.d).padStart(2,'0')}`, info};
 }
 
+/* ---------- 한국 표준시 이력 + 서머타임 ---------- */
 function kstInfo(y,m,d){
   const t=y*10000+m*100+d;
   let std = 9;
@@ -737,6 +811,7 @@ function kstInfo(y,m,d){
 }
 const SEOUL_LON = 126.978;
 
+/* ---------- 사주 산출 ---------- */
 function computeSaju(dateStr, timeStr, useTrueSolar){
   const [Y,M,D] = dateStr.split('-').map(Number);
   const hasTime = !!timeStr;
@@ -796,6 +871,10 @@ function computeSaju(dateStr, timeStr, useTrueSolar){
 }
 function ganjiStr(s,b){ return (s===null||b===null)?'??':STEMS[s]+BRANCHES[b]; }
 
+/* 그 날의 시간대(12지시) 경계를 시계 시각으로 계산한다.
+   경계는 딱 떨어지지 않는다 — 진태양시 보정 32분 때문에 01:33·03:33…에 온다.
+   서머타임·옛 표준시가 걸리면 또 밀린다. 그래서 라벨을 고정하지 않고 생일마다 새로 구한다.
+   자시는 자정을 걸치므로 하루에 두 조각(새벽·밤)으로 나온다 — 일주가 서로 다르다. */
 function hourBlocks(dateStr, useTrueSolar){
   const [Y,M,D]=dateStr.split('-').map(Number);
   const tz=kstInfo(Y,M,D);
@@ -821,6 +900,9 @@ function hourBlocks(dateStr, useTrueSolar){
 }
 function blockOfMinute(blocks,m){ return blocks.find(b=>m>=b.from&&m<=b.to); }
 
+/* =====================================================================
+   궁합 엔진 — 지지 관계
+   ===================================================================== */
 const SAMHAP=[[8,0,4],[11,3,7],[2,6,10],[5,9,1]];
 const SAMHAP_NAME=['물의 무리','나무의 무리','불의 무리','쇠의 무리'];
 const YUKHAP=[[0,1],[2,11],[3,10],[4,9],[5,8],[6,7]];
@@ -849,6 +931,27 @@ function branchRel(a,b){
 const STEM_HAP=[[0,5],[1,6],[2,7],[3,8],[4,9]];
 const STEM_CHUNG=[[0,6],[1,7],[2,8],[3,9]];
 
+/* =====================================================================
+   오행(五行) — 사주에서 가장 크게 보는 것 중 하나인데 통째로 빠져 있었다.
+   12마리에 오행 필드(o)를 넣어두고 한 번도 안 썼다 (2026-08-14 발견).
+   재보니 68%가 아예 비어 있는 오행을 갖고 있다 — 전통 궁합의 핵심 하나가
+   "내게 없는 걸 상대가 채워주는가"인데 그게 안 잡히고 있었다.
+   ===================================================================== */
+/* 전체 풀이용 — 강점과 그늘을 같이 쓴다. 좋은 말만 늘어놓으면 누구에게나 맞는 말이 된다 */
+const ANIMAL_DEEP=[
+ '눈치가 빠르고 상황을 먼저 읽어요. 낌새를 남보다 먼저 알아채고 필요한 걸 미리 챙겨둡니다. 다만 너무 재다가 시작이 늦어지기도 해요.',
+ '한 번 정하면 끝까지 갑니다. 빠른 대신 확실한 쪽이에요. 다만 방향을 바꿔야 할 때도 그냥 밀고 가는 버릇이 있습니다.',
+ '아무도 안 나설 때 먼저 손을 듭니다. 시작을 여는 힘이 있어요. 다만 벌여놓고 마무리는 남에게 넘길 때가 있습니다.',
+ '누구와도 각을 세우지 않고 잘 지냅니다. 분위기를 부드럽게 만드는 재주가 있어요. 다만 싫은 소리를 못 해 혼자 삭이기도 합니다.',
+ '하고 싶은 게 크고 많아요. 평범한 걸 못 견디고 판을 키웁니다. 다만 작고 지루한 일에서 힘이 확 빠집니다.',
+ '속을 잘 안 보여줍니다. 조용히 보다가 결정적일 때 움직여요. 다만 혼자 삼키느라 주변이 눈치를 못 챌 때가 있습니다.',
+ '가만히 있는 걸 답답해해요. 몸을 움직이고 사람을 만나야 살아납니다. 다만 시작한 게 여러 개 널려 있기도 해요.',
+ '남의 기분을 먼저 알아챕니다. 배려가 몸에 배어 있어요. 다만 그러느라 자기 것을 자꾸 뒤로 미룹니다.',
+ '막히면 다른 길을 기가 막히게 찾아냅니다. 손재주도 눈치도 빨라요. 다만 흥미가 식으면 금방 다른 데로 갑니다.',
+ '꼼꼼하고 딱 맞아야 마음이 놓입니다. 남들이 못 보는 어긋남을 봐요. 다만 그게 자기도 남도 피곤하게 할 때가 있습니다.',
+ '내 편이라고 정하면 끝까지 지킵니다. 의리가 기준이에요. 다만 아니라고 판단하면 선을 확 그어버립니다.',
+ '잘 나눠주고 사람을 잘 믿어요. 곁에 있으면 마음이 편해집니다. 다만 그래서 손해를 볼 때가 있습니다.',
+];
 const ELEMENTS=['목','화','토','금','수'];
 const STEM_O=['목','목','화','화','토','토','금','금','수','수'];   // 갑을 병정 무기 경신 임계
 const EL={
@@ -864,7 +967,12 @@ function ohaeng(saju){
   saju.branches.forEach(b=>{ if(b!==null)c[ANIMALS[b].o]++; });
   return c;
 }
-
+/* =====================================================================
+   십성(十星)과 신강·신약 — 2026-08-14 추가
+   "나"는 일간(태어난 날의 천간). 나머지 일곱 글자를 다섯 갈래로 나눈다.
+   ⚠️ 판정 기준은 파(派)마다 갈린다. 월지를 얼마나 크게 볼지, 지장간까지 셀지가 다르다.
+      그래서 간이 판정으로만 쓰고 화면에 "참고만 하세요"를 붙인다.
+   ===================================================================== */
 const SAENG=['목','화','토','금','수'];               // 목생화생토생금생수생목
 const GEUK={목:'토',토:'수',수:'화',화:'금',금:'목'};  // 내가 이기는 것
 const ROLE_INFO={
@@ -895,7 +1003,10 @@ function strength(saju){
     const r=tenGodRole(myEl,ANIMALS[b].o); roles[r]+=W_BR[i];
     (r==='비겁'||r==='인성') ? ally+=W_BR[i] : drain+=W_BR[i]; });
   const ratio=(ally+drain)?ally/(ally+drain):.4;
-  
+  /* ⚠️ 문턱을 0.5 기준으로 잡으면 안 된다. 다섯 갈래 중 내 편은 둘(비겁·인성),
+     나를 쓰는 것은 셋(식상·재성·관성)이라 자연 기준선이 0.4쯤이다.
+     0.42/0.58로 잡았더니 신약이 69%로 쏠려 세 구분이 의미를 잃었다.
+     4,000건 실측 분포로 다시 잡았다 → 신약 36% · 중화 25% · 신강 39% (2026-08-14) */
   const kind = ratio>=0.50?'신강' : ratio<=0.28?'신약' : '중화';
   const i=SAENG.indexOf(myEl);
   const map={비겁:myEl, 인성:SAENG[(i+4)%5], 식상:SAENG[(i+1)%5], 재성:GEUK[myEl],
@@ -906,6 +1017,7 @@ function strength(saju){
   return {myEl, kind, ratio, ally:+ally.toFixed(1), drain:+drain.toFixed(1), roles, map, good, bad};
 }
 
+/* 서로에게 무엇이 되는가. 각자 자기 기준으로 상대를 보고 합친다 */
 function ohaengFit(sa,sb){
   const A=ohaeng(sa), B=ohaeng(sb);
   const SA=strength(sa), SB=strength(sb);
@@ -934,11 +1046,18 @@ function ohaengFit(sa,sb){
   return {s:(a.s+b.s)/2 - floods.length*1.5, a, b, SA, SB, A, B, floods};
 }
 
+/* 아는 게 적으면 점수도 조심스러워야 한다.
+   태어난 시간을 모르면 동물이 셋인데, 그때 점수 표준편차가 18.5 → 22.0으로
+   오히려 커졌다 (2026-08-14 측정). 정보가 적은데 판정이 더 세던 것 — 거꾸로였다.
+   기둥 수에 따라 50 쪽으로 끌어당긴다. */
 function confidenceOf(sa,sb){
   const n=(sa.branches[3]===null?3:4)+(sb.branches[3]===null?3:4);   // 6~8
   return 0.72 + 0.14*(n-6);
 }
 
+/* 관계별 가중치 — 같은 두 사람도 어떤 사이로 보느냐에 따라 점수가 달라진다.
+   cross(교차쌍)를 낮게 둬야 같은 자리끼리의 비교가 결과를 지배한다.
+   0.35였을 때 세 카테고리가 48/49/45로 뭉개졌다 (2026-08-14 검증) */
 const REL_W={
   '연인':{same:[0.8,1.0,3.2,0.7],cross:0.18,hap:8,chung:-6,hyungMul:1.0,chungMul:1.30},
   // 가족: 뿌리와 환경을 공유하는 사이 → 년지·월지. 일지는 낮게 둔다
@@ -948,7 +1067,8 @@ const REL_W={
   // 친구: 일지(가까운 나)가 중심. 뿌리보다 지금의 결이 맞아야 한다
   '친구':{same:[1.4,0.9,2.4,1.0],cross:0.25,hap:6,chung:-4,hyungMul:0.90,chungMul:0.95},
 };
-
+/* 가족은 한 덩어리가 아니다 — 사주에서 보는 자리가 서로 다르다 (2026-08-15 다현님 질문)
+   부모=월주(부모궁) · 자식=시주(자식궁) · 형제=월주+년주 · 배우자=일지(배우자궁, 연인과 같은 자리) */
 const FAMILY_SUBS=['부모','자식','형제'];
 Object.assign(REL_W,{
   '가족·부모':{same:[1.6,2.9,0.8,0.9],cross:0.25,hap:5,chung:-3,hyungMul:1.50,chungMul:0.60},
@@ -964,11 +1084,13 @@ const SUB_WHY={
 };
 const CATS=['가족','직장','친구','연인'];
 const CAT_LABEL={'가족':'가족','직장':'직장','친구':'친구','연인':'연인·배우자'};
-
+/* 배우자는 일지(배우자궁)라 연인과 같은 자리다. 그래서 따로 두지 않고 '연인·배우자'로 합친다 */
 const relOf=f=>{ const c=migrateCat(f.cat); return (c==='가족'&&f.sub)? '가족·'+f.sub : c; };
 const CAT_COLOR={'가족':'var(--fam)','직장':'var(--wrk)','친구':'var(--acq)','연인':'var(--lov)'};
 const migrateCat=c=>c==='지인'?'친구':(CATS.includes(c)?c:'친구');   // 옛 '지인' 데이터 이관
-
+/* 보정 — 원점수는 대부분 45~66에 몰려 최고 등급이 도달 불가능했다(780쌍 중 85점 0건).
+   중앙(54) 기준으로 위는 넓게, 아래는 좁게 편다. 아래를 덜 펴는 건 표현 규율 때문이다 —
+   최하 등급은 드물게, 정말 그럴 때만 나와야 한다. */
 function calibrate(s){
   const v = 50 + (s-54)*(s>=54 ? 2.1 : 1.5);
   return Math.max(8, Math.min(97, Math.round(v)));
@@ -1024,10 +1146,19 @@ const GRADES=[
  {min:0, l:'많이 다른 사이', d:'사는 방식이 서로 많이 달라요. 상대를 이해하려 애쓰기보다 다르다는 걸 인정하고 각자의 자리를 두는 편이 서로에게 좋습니다.'},
 ];
 function gradeOf(s){ return GRADES.find(g=>s>=g.min); }
-
-function lowNote(score,type){
+/* 낮은 점수일 때 관계별로 덧붙이는 한 줄 — 판정이 아니라 다룰 방법을 준다.
+   연인은 일지 가중치가 커서 낮은 점수가 7~8% 나온다. 점수를 뭉개는 대신 말로 감당한다. */
+function lowNote(score,type,a,b){
   if(score>=45) return '';
   type=String(type).split('·')[0];        // '가족·부모' → '가족'
+  /* ⚠️ 「일지가 정면으로 마주 선」은 일지끼리 충일 때만 사실이다.
+     예전엔 연인 45점 미만이면 무조건 이 문장을 썼는데, 무작위 3,000쌍에서 45점 미만 연인 중
+     실제 일지 충은 22%뿐이었다(2026-10-04 실측). 화면이 사실 아닌 말을 하지 않게 자리를 확인하고 쓴다 */
+  if(type==='연인' && a && b && a.branches[2]!==null && b.branches[2]!==null){
+    const dr=branchRel(a.branches[2],b.branches[2]);
+    if(dr.k!=='충' && dr.s<0) return `둘의 「진짜 나인 동물」이 <b>${dr.k}</b>${josa(dr.k,'으로','로')} 만나서 이렇게 나와요. 연인은 이 자리를 가장 크게 봅니다 — 걸리는 지점이 뻔해서 <b>미리 정해둘 수 있는</b> 사이예요.`;
+    if(dr.k!=='충') return '연인은 「진짜 나인 동물」끼리를 가장 크게 보는데, 여기선 그 자리보다 <b>다른 자리의 부딪힘</b>이 쌓여서 이렇게 나와요. 점수보다 <b>어디서 부딪히는지</b>가 중요해요 — 아래 「눈에 띄는 만남」에 그 자리가 있습니다.';
+  }
   if(type==='연인') return '일지가 정면으로 마주 선 조합일 때 이렇게 나와요. 사주에서 가장 많이 이야기되는 자리인데, <b>오래 가는 커플도 여기 많습니다</b> — 부딪히는 지점이 뻔해서 미리 정해둘 수 있거든요.';
   if(type==='가족') return '가족은 고를 수 없죠. 이 숫자는 <b>맞고 틀리고가 아니라 결이 다르다</b>는 뜻이에요. 자주 붙어 있기보다 각자의 리듬을 인정할 때 편해지는 사이입니다.';
   if(type==='직장') return '일하는 방식이 서로 많이 달라요. <b>사람이 문제가 아니라 속도와 순서가 다른 것</b>일 때가 많습니다. 말로 맞추려 하기보다 문서나 메시지로 남기면 훨씬 덜 부딪혀요.';
@@ -1041,6 +1172,10 @@ function scoreColor(s){
   return '#D9705F';
 }
 
+/* ---------- 기운 (나 vs 그 해/달/날) ----------
+   ⚠️ 지지(동물)만 보면 12일마다 똑같은 날이 돌아온다. 실제로 그렇게 만들었더니
+   "둘 다 좋은 날"이 매달 원숭이날 셋뿐이었다. 일진은 천간+지지이므로 천간도 본다.
+   그래야 주기가 12일이 아니라 60일이 되고, 같은 동물 날도 서로 달라진다. (2026-08-14) */
 function luckScore(me, br, st){
   const W=[1.0,1.3,2.0,0.9];
   let raw=0,tot=0,best=null;
@@ -1061,8 +1196,15 @@ function luckScore(me, br, st){
   return {score:Math.max(5,Math.min(98,Math.round(50+avg*3.6+stemTerm))), best, stemNote};
 }
 
-const APP_VER = '2026-08-15 · 8';
-const PAY_ENABLED = false;
+/* =====================================================================
+   결제 — 모여셈의 PRO_ENABLED와 같은 패턴
+   ⚠️ 다현님이 국민취업지원 수급 중(월 60만원)이고, 웹 결제는 PG 계약에
+   사업자등록증 + 통신판매업 신고번호가 필수다. 사업자등록은 창업으로 간주돼
+   수당이 끊길 수 있다. → 구조는 다 만들되 스위치는 꺼두고, 종료 후 켠다.
+   ===================================================================== */
+/* 화면 맨 아래에 찍는다 — "반영이 안 된 것 같다" 싶을 때 캐시인지 아닌지 바로 갈린다 */
+const APP_VER = '2026-10-04 · 14';
+const PAY_ENABLED = false;        // 국민취업지원 종료 후 true
 const FREE_LIMIT  = 3;            // 무료로 볼 수 있는 친구 수
 const PRICE_ONE   = 990;
 const PRICE_ALL   = 9900;
@@ -1071,7 +1213,9 @@ let purchase={unlimited:false, slots:0, spent:0, reading:false};
 const hasReading=()=>purchase.reading||purchase.unlimited;
 let WAITLIST=null;                 // 결제가 열리기 전, 살 마음이 있는 사람을 세는 자리
 const isPro=()=>purchase.unlimited;
-
+/* 기본 ↔ 프로 경계.
+   ⚠️ 첫 궁합은 절대 잠그지 않는다 — 링크가 안 퍼지면 결제할 사람도 안 생긴다.
+   잠그는 건 "더 넓게 / 더 여러 각도로 보는 것"뿐이다. */
 const PRO_FEATURES=[
   {k:'friends', n:'친구 수',            free:`${FREE_LIMIT}명까지`, pro:'무제한'},
   {k:'match',   n:'궁합 점수·해설·오행', free:'전부 보여요',        pro:'전부 보여요'},
@@ -1085,6 +1229,11 @@ function capacity(){ return purchase.unlimited ? Infinity : FREE_LIMIT + purchas
 function remainFree(){ return Math.max(0, capacity()-FRIENDS.length); }
 function upgradeCost(){ return Math.max(0, PRICE_ALL - purchase.spent); }
 
+/* =====================================================================
+   상태 / 저장
+   ===================================================================== */
+/* 저장소 — localStorage가 막힌 곳(시크릿 모드·iOS 제한·data: URL)에서는 메모리로 넘어간다.
+   try/catch로 삼키기만 하면 저장이 조용히 실패해 "저장했는데 없어졌다"가 된다 (2026-08-14) */
 const MEM={};
 const store={
   get(k){ try{ return localStorage.getItem(k); }catch(e){ return k in MEM?MEM[k]:null; } },
@@ -1092,9 +1241,11 @@ const store={
   get persistent(){ try{ localStorage.setItem('__t','1'); localStorage.removeItem('__t'); return true; }catch(e){ return false; } }
 };
 const LS='zoo_v1';
+const DEMO_BAK='zoo_demo_backup';   // '#demo' 전의 진짜 기록을 넣어두는 자리 ('#demo-off'로 되돌린다)
 let ME=null, FRIENDS=[], GUEST=null, HOST=null, curRel='친구', curCat='all', calOffset=0, ACCOUNT=null;
 let PREVIEW_BACKUP=null, ADDING_FRIEND=false, PAY_PROMPT=null, curSub='부모', pendingDelete=null;
-
+let PENDING_BACK=null;   // 회신 링크로 왔는데 내 동물원이 아직 없을 때 들고 있는 친구
+/* 프로 기능을 눌렀을 때 결제 화면으로 데려간다 (자리가 남아 있어도) */
 function askPro(reason){
   PAY_PROMPT=reason; renderMap(); show('map');
   $('paywall').scrollIntoView({behavior:'smooth',block:'center'});
@@ -1105,6 +1256,13 @@ function load(){ try{ const d=JSON.parse(store.get(LS)||'null');
   if(d){ME=d.me;FRIENDS=d.friends||[];purchase=d.purchase||purchase;ACCOUNT=d.account||null;} }catch(e){}
   try{ WAITLIST=JSON.parse(store.get('zoo_waitlist')||'null'); }catch(e){} }
 
+/* =====================================================================
+   계정 저장 — 폰을 바꿔도 잃지 않게
+   ⚠️ 지금은 목업이라 브라우저의 다른 칸을 '서버'인 척 쓴다.
+      실제로는 Supabase(Auth + Postgres)에 넣는다. 흐름은 똑같다:
+      로그인 → 이 기기 데이터를 계정에 올림 → 다른 기기에서 로그인하면 내려받음.
+   ⚠️ 실제 구현에서 결제 이력은 반드시 서버가 진실의 원천이어야 한다.
+      지금처럼 브라우저에만 두면 개발자도구로 고칠 수 있다. =============== */
 const CLOUD='zoo_cloud_v1';
 function cloudKey(){ return ACCOUNT? CLOUD+':'+ACCOUNT.id : null; }
 function cloudPush(){
@@ -1125,7 +1283,8 @@ function agoText(ts){
 
 const b64e=s=>btoa(String.fromCharCode(...new TextEncoder().encode(s))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
 const b64d=s=>new TextDecoder().decode(Uint8Array.from(atob(s.replace(/-/g,'+').replace(/_/g,'/')),c=>c.charCodeAt(0)));
-
+/* withZoo=true면 '친구가 몇 명이고 어떤 사이인지'만 함께 싣는다.
+   ⚠️ 친구 이름·생년월일·동물은 절대 안 싣는다 — 손님에게 가림 처리로만 보인다 */
 function packPerson(p, withZoo){
   const o={n:p.name,s:p.saju.stems,b:p.saju.branches,c:p.cat||null,u:p.sub||null};
   if(withZoo) o.z=FRIENDS.map(f=>migrateCat(f.cat));
@@ -1136,9 +1295,13 @@ function unpackPerson(code){
   return {name:o.n, cat:o.c, sub:o.u||null, zoo:o.z||null, saju:{stems:o.s,branches:o.b,hasTime:o.b[3]!==null,warn:[]}};
 }
 
+/* =====================================================================
+   화면
+   ===================================================================== */
 const $=id=>document.getElementById(id);
 const VIEWS=['input','zoo','map','luck','invite','match'];
-
+/* 뒤로가기 — 화면의 「‹ 뒤로」와 폰의 뒤로가기 버튼이 같은 동작을 한다.
+   입력 화면은 하단 탭이 숨겨져서 들어가면 나올 방법이 없었다 (2026-08-15) */
 let backTarget='map', suppressPush=false, pushedDepth=0;
 function show(v){
   VIEWS.forEach(x=>$('v-'+x).classList.toggle('hide',x!==v));
@@ -1158,12 +1321,15 @@ function goBack(){
   renderAll();
   suppressPush=true; show(backTarget); suppressPush=false;
 }
-
+/* 우리가 넣은 기록이 있으면 history.back()으로 돌아간다 — 기록이 어긋나지 않게.
+   없으면(직접 열었거나 이미 다 되감았으면) 바로 화면만 되돌린다 */
 function backNow(){
   if(pushedDepth>0){ history.back(); }   // popstate가 goBack()을 부른다
   else goBack();
 }
-
+/* 첫 화면 로그인 — 새 폰에서 돌아온 사람이 바로 되찾을 수 있게.
+   저장된 게 없으면 새로 시작한다고 알려준다 (빈 화면만 주면 로그인이 실패한 줄 안다) */
+/* 캐시를 확실히 밀어내고 다시 받는다 — 주소에 시각을 붙이면 새 파일을 받는다 */
 $('app-ver').textContent=APP_VER;
 $('btn-refresh').addEventListener('click',()=>{
   location.replace(location.href.split('#')[0].split('?')[0]+'?v='+Date.now());
@@ -1224,7 +1390,9 @@ function renderZoo(){
   // 오행 — 무엇이 넘치고 무엇이 없나
   const c=ohaeng(s), max=Math.max(...ELEMENTS.map(e=>c[e]));
   const none=ELEMENTS.filter(e=>c[e]===0), most=ELEMENTS.filter(e=>c[e]===max);
-  
+  /* ⚠️ 막대 높이를 개수에 그대로 비례시키면(5+n*13) 컨테이너를 뚫고 올라가 숫자가 제목에 겹친다.
+     목·화가 많은 사주에서 실제로 그랬다 (2026-08-14 다현님 발견).
+     가장 큰 값을 기준으로 정규화해서 제일 높은 막대가 언제나 같은 높이가 되게 한다. */
   const maxN=Math.max(1,...ELEMENTS.map(e=>c[e])), BAR=58;
   $('my-oh').innerHTML=`<div style="display:flex;gap:6px;align-items:flex-end;height:${BAR+22}px">${ELEMENTS.map(e=>{
       const n=c[e], info=EL[e];
@@ -1278,6 +1446,7 @@ function renderZoo(){
   else $('raw-warn').classList.add('hide');
 }
 
+/* ---------- 내 사주 전체 풀이 ---------- */
 function renderReading(saju,name){
   const secs=readingOf(saju,name);
   const box=$('reading-body');
@@ -1311,6 +1480,7 @@ function renderReading(saju,name){
   ['buy-read','mock-read'].forEach(id=>$(id)&&$(id).addEventListener('click',buy));
 }
 
+/* ---------- 계정 (로그인하면 다른 기기에서도 불러온다) ---------- */
 function renderAccount(){
   if(ACCOUNT){
     $('acct-body').innerHTML=`<div class="acctrow">
@@ -1352,6 +1522,9 @@ function renderAccount(){
   }
 }
 
+/* ---------- 기본↔프로 비교 (언제든 볼 수 있게) ----------
+   ⚠️ 예전엔 결제 화면 안에만 있어서, 자리가 다 차거나 잠긴 기능을 누르기 전엔
+   볼 방법이 아예 없었다 (2026-08-14 다현님 지적) */
 let planOpen=false;
 function renderPlan(){
   const pro=isPro();
@@ -1375,6 +1548,7 @@ function renderPlan(){
 }
 $('btn-plan').addEventListener('click',()=>{ planOpen=!planOpen; renderPlan(); });
 
+/* ---------- 결제 ---------- */
 function renderPaywall(){
   const box=$('paywall'), chip=$('cap-chip');
   // 남은 자리 칩
@@ -1424,7 +1598,9 @@ function renderPaywall(){
   const buyAll=()=>{purchase.spent+=upgradeCost();purchase.unlimited=true;PAY_PROMPT=null;save();renderAll();toast('프로가 됐어요 🐾 이제 전부 열려요');};
   ['buy-one','mock-one'].forEach(id=>$(id)&&$(id).addEventListener('click',buyOne));
   ['buy-all','mock-all'].forEach(id=>$(id)&&$(id).addEventListener('click',buyAll));
-  
+  /* 결제를 못 여는 동안 '살 마음이 있는 사람'을 세는 자리.
+     결제 시스템을 먼저 만드는 것보다 이게 먼저다 — 살 사람이 있는지부터 확인한다.
+     실제로는 서버(Supabase)에 계정·시점·어느 기능에서 눌렀는지를 남긴다 */
   $('btn-waitlist')&&$('btn-waitlist').addEventListener('click',()=>{
     WAITLIST={at:Date.now(), from:PAY_PROMPT||'자리 다 참', friends:FRIENDS.length};
     store.set('zoo_waitlist',JSON.stringify(WAITLIST));
@@ -1432,12 +1608,16 @@ function renderPaywall(){
   });
 }
 
+/* ---------- 관계도 ---------- */
 function renderMap(){
   if(!ME)return;
   renderPaywall();
   const list = FRIENDS.filter(f=>curCat==='all'||f.cat===curCat);
   $('map-sub').textContent = FRIENDS.length? `${FRIENDS.length}명이 함께 있어요` : '아직 아무도 없어요. 링크를 보내보세요';
-  
+  /* 배치 규칙 (2026-08-14 — 글자가 선 위에 얹히던 것 수정)
+     ① 이름·점수를 원 아래 고정하지 않고 <중심 반대쪽>으로 민다. 위쪽 친구면 글자도 위로 간다
+     ② 선은 중심과 원에 닿기 전에 끊는다 — 원 밑으로 파고들지 않게
+     ③ 글자에 배경색 테두리(halo)를 둘러 어떤 선 위에서도 읽히게 한다 */
   const S=380,C=S/2,R=118,NR=21;
   let lines='',nodes='';
   const halo=`stroke="var(--bg)" stroke-width="3.5" paint-order="stroke" stroke-linejoin="round"`;
@@ -1517,6 +1697,7 @@ function renderMap(){
   }));
 }
 
+/* ---------- 기운 달력 ---------- */
 function dayGanjiIdx(y,m,d){ return ((jdn(y,m,d)+49)%60+60)%60; }
 function renderLuck(){
   if(!ME)return;
@@ -1525,7 +1706,9 @@ function renderLuck(){
   const ti=dayGanjiIdx(now.getFullYear(),now.getMonth()+1,now.getDate());
   const tb=ti%12, tl=luckScore(ME.saju,tb,ti%10), ta=ANIMALS[tb];
   const rel=tl.best?branchRel(ME.saju.branches[tl.best.i],tb):null;
-  
+  /* 오늘 뭘 가까이할까 —
+     좋은 날이면 오늘 동물을 그대로, 나쁜 날이면 오늘 동물을 붙잡아주는 짝꿍(육합)을 부른다.
+     명리에서 충을 푸는 방식이 합이다. 아무 동물이나 고르지 않는다. */
   let tgt, why;
   if(tl.score>=58){ tgt=tb; why=`오늘은 기운이 도는 날이에요. <b>${ta.n}</b>${josa(ta.n,'을','를')} 가까이 두면 더 좋습니다.`; }
   else if(tl.score<=45){ tgt=YUKHAP_OF(tb); why=`오늘 ${ta.n}${josa(ta.n,'과','와')}는 조금 어긋나요. <b>${ANIMALS[tgt].n}</b>${josa(ANIMALS[tgt].n,'은','는')} ${ta.n}의 짝꿍(육합)이라 그 사이를 눌러줍니다.`; }
@@ -1590,6 +1773,12 @@ function renderLuck(){
     <span class="muted">조심할 날</span> ${worst.map(b=>`${M}/${b.d} ${b.a.e}`).join(' · ')}`;
 }
 
+/* =====================================================================
+   내 사주 전체 풀이 (500원) — 무료는 '재료', 유료는 '읽어주는 이야기'
+   ⚠️ 뉘앙스는 끝까지 동물 친구로 간다. 오행·십성 용어를 앞세우지 않는다.
+      (2026-08-15 친구 피드백: "내 주변 동물 친구들 기운, 도움되는 친구들 기운
+       이런 식으로 귀요미 뽀짝하게")
+   ===================================================================== */
 const EL_ANIMALS={목:[2,3],화:[5,6],토:[1,4,7,10],금:[8,9],수:[0,11]};
 const animalsOf=e=>EL_ANIMALS[e].map(b=>ANIMALS[b]);
 function readingOf(saju,name){
@@ -1649,6 +1838,9 @@ function readingOf(saju,name){
   return secs;
 }
 
+/* ---------- 오늘의 사람들 ----------
+   ⚠️ 표현 규율(6장): "피하세요"는 쓰지 않는다. 이 앱은 실제 관계에 개입한다.
+   회피 지시가 아니라 <오늘의 상태 + 다룰 방법>으로 쓴다. 그래야 쓸모도 있고 해롭지도 않다. */
 const DAY_ADVICE={
   good:{'직장':'부탁하거나 보고할 게 있으면 오늘이에요.','가족':'오늘 연락 한 번 드리면 잘 받아주실 거예요.',
         '연인':'오늘은 같이 있으면 편한 날이에요.','친구':'오늘 약속 잡기 좋아요.'},
@@ -1675,6 +1867,9 @@ function renderTodayPeople(tb){
     }).join('');
 }
 
+/* ---------- 손님이 보는 초대자의 동물원 (다른 사람은 가림) ----------
+   ★ 바이럴 지점. "어? 이런 관계도도 볼 수 있어?" 하고 자기 것을 만들게 하는 자리.
+   ⚠️ 링크에는 친구들의 카테고리와 수만 담긴다. 이름·생년월일·동물은 담기지 않아 보여줄 수도 없다. */
 function renderHostZoo(r){
   const box=$('mt-hostzoo');
   if(!GUEST || !HOST){ box.classList.add('hide'); return; }
@@ -1722,6 +1917,7 @@ function renderHostZoo(r){
   $('hz-legend').innerHTML=used.map(c=>`<span><i style="background:${CAT_COLOR[c]}"></i>${c}</span>`).join('');
 }
 
+/* ---------- 궁합 결과 ---------- */
 function renderMatch(){
   const A = GUEST? GUEST : ME;      // 지금 이 화면을 보는 사람
   const B = GUEST? HOST : (window.__viewFriend||null);
@@ -1746,7 +1942,7 @@ function renderMatch(){
   $('mt-bar').style.width=r.score+'%';
   $('mt-bar').style.background=col;
   let desc=g.d;
-  const ln=lowNote(r.score,curRel); if(ln) desc+=`<br><br>${ln}`;
+  const ln=lowNote(r.score,curRel,A.saju,B.saju); if(ln) desc+=`<br><br>${ln}`;
   // ⚠️ 예전엔 "흔치 않습니다"라고 썼는데 실제로 재보니 32.7%였다. 사실이 아닌 말은 쓰지 않는다 (2026-08-14)
   if(r.trios.length) desc+=` 그리고 두 사람의 동물을 합치면 <b>${r.trios.map(t=>SAMHAP_NAME[t]).join('·')}</b>가 셋 다 모여요. 같은 방향을 보는 동물이 셋이면 그 기운이 세집니다.`;
   if(r.stemNote) desc+=`<br><br><b>${r.stemNote.k}</b> — ${r.stemNote.t}`;
@@ -1849,11 +2045,18 @@ function renderMatch(){
   if(GUEST){
     $('mt-guest').classList.remove('hide');
     $('mt-host').textContent=HOST.name;
-    $('guest-code').textContent='ZOO-'+packPerson({name:GUEST.name,saju:GUEST.saju,
+    $('mt-host2').textContent=HOST.name;
+    const payload=packPerson({name:GUEST.name,saju:GUEST.saju,
       cat:curRel, sub:curRel==='가족'?curSub:null});
+    $('guest-code').textContent='ZOO-'+payload;
+    $('guest-link').textContent=shownURL(backURL(payload));
   } else $('mt-guest').classList.add('hide');
 }
 
+/* =====================================================================
+   이벤트
+   ===================================================================== */
+/* ---------- 양력 / 음력 입력 ---------- */
 let calType='solar';
 (function initLunarSelects(){
   const y=$('l-y'), m=$('l-m'), d=$('l-d');
@@ -1886,6 +2089,7 @@ document.querySelectorAll('#seg-cal button').forEach(b=>b.addEventListener('clic
   if(calType==='lunar')updateLunarUI();
 }));
 
+/* ---------- 태어난 시간: 시각 / 동물 시간대 / 모름 ---------- */
 let timeMode='exact', pickedBlockMin=null;
 function currentDateStr(){
   if(calType==='lunar'){ const r=$('l-preview').dataset.ok; return r||null; }
@@ -1930,7 +2134,7 @@ document.querySelectorAll('#seg-time button').forEach(b=>b.addEventListener('cli
 $('f-time').addEventListener('input',renderTimeUI);
 $('f-date').addEventListener('change',renderTimeUI);
 $('f-solar').addEventListener('change',renderTimeUI);
-
+/* 선택된 시각을 HH:MM으로 돌려준다. 모름이면 null */
 function chosenTime(){
   if(timeMode==='none') return null;
   if(timeMode==='block'){
@@ -1970,9 +2174,13 @@ $('btn-go').addEventListener('click',()=>{
     toast(`${nim(person.name)}이 들어왔어요 🐾`); return;
   }
   if(HOST){ GUEST=person; renderMatch(); show('match'); }
-  else { ME=person; save(); renderAll(); show('zoo'); }
+  else {
+    ME=person; save(); renderAll(); show('zoo');
+    // 회신 링크로 들어왔는데 내 동물원이 없었던 경우 — 들고 있던 친구를 이제 넣는다
+    if(PENDING_BACK){ const p=PENDING_BACK; PENDING_BACK=null; addPerson(p); }
+  }
 });
-
+/* ---------- 내가 직접 친구 넣기 ---------- */
 function startAddFriend(){
   ADDING_FRIEND=true; HOST=null; GUEST=null; backTarget='map';
   $('cat-pick').classList.remove('hide');
@@ -2051,22 +2259,27 @@ const moveCal=d=>{
 $('cal-prev').addEventListener('click',()=>moveCal(-1));
 $('cal-next').addEventListener('click',()=>moveCal(1));
 
+/* ⚠️ location.origin을 쓰면 안 된다 — file://에서 문자열 "null"이 나와 링크가 통째로 깨진다.
+   (2026-08-14: 복사된 링크가 "nullD:/depper OS/…" 였다) */
 function inviteURL(){ return location.href.split('#')[0]+'#i='+packPerson(ME,true); }
+/* 회신 링크 — 친구가 자기 생일을 넣은 뒤 나에게 되돌려주는 주소 (2026-08-26)
+   ⚠️ 서버가 없으니 '친구가 넣으면 자동으로 들어온다'는 여기까지다.
+   친구가 링크를 보내주는 한 걸음은 남고, 대신 내가 코드를 붙여넣던 한 걸음이 사라진다 */
+function backURL(payload){ return location.href.split('#')[0]+'#b='+payload; }
+// 목업을 파일로 열면 주소가 data: URL이라 파일 전체가 링크로 보인다. 배포 후 모습으로 보여준다
+function shownURL(u){ return /^(data|blob):/.test(u) ? `(배포 후 주소)/${u.slice(u.indexOf('#'))}` : u; }
 function renderInvite(){
   if(!ME)return;
   // 내 코드 — 친구가 자기 동물원에 나를 넣을 때 쓴다 (링크와 반대 방향)
   $('my-code').textContent='ZOO-'+packPerson(ME);
-  const u=inviteURL();
-  // 목업을 파일로 열면 주소가 data: URL이라 파일 전체가 링크로 보인다. 배포 후 모습으로 보여준다
-  $('inv-link').textContent = /^(data|blob):/.test(u)
-    ? `(배포 후 주소)/${u.slice(u.indexOf('#'))}`
-    : u;
+  $('inv-link').textContent = shownURL(inviteURL());
 }
 $('btn-copy').addEventListener('click',async()=>{
   try{await navigator.clipboard.writeText(inviteURL());toast('링크를 복사했어요 🔗');}
   catch(e){toast('길게 눌러 복사해 주세요');}
 });
-
+/* 친구 시점 미리보기 — 새로고침에 기대지 않는다.
+   해시를 붙이고 reload하던 방식은 file://과 미리보기에서 해시가 날아가 아무 반응이 없었다. */
 $('btn-openlink').addEventListener('click',()=>{
   if(!ME){toast('먼저 내 동물을 만들어주세요');return;}
   PREVIEW_BACKUP={me:ME, friends:FRIENDS};
@@ -2084,12 +2297,13 @@ function renderPreviewBar(){
     renderPreviewBar(); renderAll(); show('invite');
   });
 }
-
+/* 코드만 덜렁 보내면 받는 사람은 뭔지도 어디 넣는지도 모른다.
+   설명과 주소를 붙여 '그대로 붙여넣으면 되는 메시지'로 복사한다 (2026-08-15) */
 function myCodeMessage(){
   const base=location.href.split('#')[0];
   const shown=/^(data|blob):/.test(base) ? '(배포 후 주소)' : base;
   return `${nim(ME.name)}의 동물 네 마리예요 🐾\n`
-    + `아래 코드를 복사해서 동물원 「초대」탭 → 「친구가 코드를 보내줬다면」에 넣으면\n`
+    + `아래 코드를 복사해서 동물원 「관계도」탭 → 「친구가 코드를 보내줬다면」에 넣으면\n`
     + `우리 둘의 궁합이 바로 나와요.\n\n`
     + `${$('my-code').textContent}\n\n`
     + `동물원이 아직 없다면 여기서 → ${shown}`;
@@ -2102,15 +2316,43 @@ $('btn-copycode').addEventListener('click',async()=>{
   try{await navigator.clipboard.writeText($('guest-code').textContent);toast('코드를 복사했어요');}
   catch(e){toast('길게 눌러 복사해 주세요');}
 });
+/* 회신 링크도 코드와 같다 — 덜렁 주소만 보내면 뭔지 모른다. 설명을 붙여 통째로 복사한다 */
+$('btn-copyback').addEventListener('click',async()=>{
+  const msg=`${nim(GUEST.name)}의 동물들이에요 🐾\n`
+    + `아래 링크를 누르면 ${nim(HOST.name)} 동물원에 바로 들어가요.\n\n`
+    + `${$('guest-link').textContent}`;
+  try{await navigator.clipboard.writeText(msg);toast('회신 링크를 복사했어요 — 카톡에 붙여넣으세요 🔗');}
+  catch(e){toast('길게 눌러 복사해 주세요');}
+});
+$('btn-gcode-toggle').addEventListener('click',()=>{
+  const b=$('gcode-body'), open=b.classList.contains('hide');
+  b.classList.toggle('hide',!open); $('gcode-arrow').textContent=open?'▴':'▾';
+});
+/* 관계도에서 바로 부탁하기 — 초대 탭까지 가지 않아도 되게 (2026-08-26 다현님) */
+$('btn-askfriend').addEventListener('click',async()=>{
+  if(!ME){toast('먼저 내 동물을 만들어주세요');return;}
+  const msg=`${nim(ME.name)}의 동물원에 초대할게요 🐾\n`
+    + `아래 링크에 생년월일만 넣으면 우리 둘의 궁합이 바로 나와요.\n`
+    + `그 다음 화면에 뜨는 회신 링크만 나한테 보내주면 끝이에요.\n\n`
+    + `${shownURL(inviteURL())}`;
+  try{await navigator.clipboard.writeText(msg);toast('메시지째로 복사했어요 — 카톡에 붙여넣으세요 🔗');}
+  catch(e){toast('길게 눌러 복사해 주세요');}
+});
+$('btn-paste-toggle').addEventListener('click',()=>{
+  const b=$('paste-body'), open=b.classList.contains('hide');
+  b.classList.toggle('hide',!open); $('paste-arrow').textContent=open?'▴':'▾';
+});
 const becomeMine=()=>{
-  
+  /* 손님은 이미 초대한 사람의 사주를 들고 있다(링크에 실려 왔다).
+     그런데 예전엔 그냥 버리고 빈 동물원을 만들어줬다 — 서로 코드를 주고받게 만드는 헛수고였다.
+     초대한 사람을 첫 친구로 바로 넣어준다 (2026-08-15) */
   const host=HOST, rel=curRel, sub=curRel==='가족'?curSub:null;
   ME=GUEST; HOST=null; GUEST=null; PREVIEW_BACKUP=null; renderPreviewBar();
   FRIENDS = host ? [{name:host.name, cat:rel, sub, saju:host.saju}] : [];
   location.hash=''; save(); renderAll(); show('zoo');
   toast(host? `내 동물원이 생겼어요 🐾 ${nim(host.name)}도 같이 들어왔어요` : '내 동물원이 생겼어요 🐾');
 };
-
+/* 궁합 보다가 빼고 싶을 때. 관계도로 데려가 확인 줄을 띄운다 — 지우는 건 한 곳에서만 */
 $('btn-removefriend').addEventListener('click',()=>{
   if(!window.__viewFriend)return;
   pendingDelete=window.__viewFriend.name;
@@ -2119,22 +2361,25 @@ $('btn-removefriend').addEventListener('click',()=>{
 });
 $('btn-mine').addEventListener('click',becomeMine);
 $('btn-makemine').addEventListener('click',becomeMine);
+/* 코드 붙여넣기와 회신 링크가 결국 같은 일을 한다 — 넣는 자리는 하나로 둔다 (2026-08-26) */
+function addPerson(p){
+  p.cat=migrateCat(p.cat);
+  const replacing=FRIENDS.some(f=>f.name===p.name);
+  // 이미 있는 친구를 갱신하는 건 자리를 새로 쓰는 게 아니다
+  if(!replacing && FRIENDS.length>=capacity()){
+    renderMap(); show('map'); toast('자리가 다 찼어요');
+    $('paywall').scrollIntoView({behavior:'smooth',block:'center'}); return false;
+  }
+  if(replacing) FRIENDS=FRIENDS.filter(f=>f.name!==p.name);
+  FRIENDS.push(p); save(); renderAll(); show('map');
+  toast(`${nim(p.name)}이 ${replacing?'새로 들어왔어요':'들어왔어요'} 🐾`);
+  return true;
+}
 function pasteFriend(inputId){
   const v=($(inputId).value||'').trim().replace(/^ZOO-/,'');
   if(!v){toast('코드를 붙여넣어 주세요');return;}
-  try{
-    const p=unpackPerson(v);
-    p.cat=migrateCat(p.cat);
-    const replacing=FRIENDS.some(f=>f.name===p.name);
-    // 이미 있는 친구를 갱신하는 건 자리를 새로 쓰는 게 아니다
-    if(!replacing && FRIENDS.length>=capacity()){
-      renderMap(); show('map'); toast('자리가 다 찼어요');
-      $('paywall').scrollIntoView({behavior:'smooth',block:'center'}); return;
-    }
-    if(replacing) FRIENDS=FRIENDS.filter(f=>f.name!==p.name);
-    FRIENDS.push(p); save(); $(inputId).value=''; renderAll(); show('map');
-    toast(`${nim(p.name)}이 들어왔어요 🐾`);
-  }catch(e){ toast('코드를 못 읽었어요'); }
+  try{ if(addPerson(unpackPerson(v))) $(inputId).value=''; }
+  catch(e){ toast('코드를 못 읽었어요'); }
 }
 $('btn-paste').addEventListener('click',()=>pasteFriend('f-paste'));
 $('btn-mycode-toggle').addEventListener('click',()=>{
@@ -2142,19 +2387,19 @@ $('btn-mycode-toggle').addEventListener('click',()=>{
   b.classList.toggle('hide',!open); $('mycode-arrow').textContent=open?'▴':'▾';
 });
 
+/* 이름을 앞에 붙여 '내 것'으로 만든다. 손님으로 왔으면 초대한 사람의 동물원이다 */
 function zooName(){
   // 초대 링크로 들어왔으면 여기는 '초대한 사람의 동물원'이다 — 손님이 생일을 넣기 전부터 그렇다
   const who = HOST || ME;
-  return who ? `${who.name}의 동물원` : '동물원';
+  return who ? `${who.name}의 동물원` : '사주동물원';
 }
 function renderBrand(){
   const n=zooName();
-  $('logo').innerHTML = n==='동물원' ? '🐾 동물<span>원</span>'
-    : `🐾 ${n.slice(0,-1)}<span>원</span>`;
+  $('logo').innerHTML = `🐾 ${n.slice(0,-1)}<span>원</span>`;
   document.title = `${n} — 나와 함께 걷는 네 마리`;
   const h=$('map-title'); if(h) h.textContent = ME?`${ME.name}의 동물원`:'나의 동물원';
 }
-function renderAll(){ renderBrand(); renderZoo(); renderMap(); renderLuck(); renderInvite(); renderTodayChip(); }
+function renderAll(){ renderBrand(); renderZoo(); renderMap(); renderLuck(); renderInvite(); renderTodayChip(); renderA2HS(); }
 function renderTodayChip(){
   const n=new Date(), gi=dayGanjiIdx(n.getFullYear(),n.getMonth()+1,n.getDate()), br=gi%12, a=ANIMALS[br];
   let t=`오늘 ${a.e}${a.n}날`;
@@ -2163,9 +2408,126 @@ function renderTodayChip(){
   $('todaychip').textContent=t;
 }
 
+/* =====================================================================
+   홈 화면에 두기 (2026-10-04 다현님 요청)
+   어디서 열었느냐에 따라 할 수 있는 게 다르다 — 그래서 한 가지 버튼이 아니라 네 갈래다.
+   · 안드로이드 크롬 등: 브라우저가 beforeinstallprompt를 주면 그걸 붙잡아 우리 버튼으로 띄운다
+   · 아이폰: 자바스크립트로 설치를 띄울 방법이 없다 → 공유 → 「홈 화면에 추가」 순서를 보여준다
+   · 카톡·인스타 등 앱 안 브라우저: 홈 화면에 둘 수 없다 → 다른 브라우저로 여는 길 + 동물원을 같이 옮기는 주소
+   · 이미 홈 화면에서 연 것(standalone): 아무것도 안 띄운다
+   ⚠️ 저장은 브라우저마다 따로다. 카톡 안에서 만든 동물원은 크롬에 없다 — 그래서 옮겨 가는 주소(#m=)에 내 동물원을 싣는다.
+      이건 내 브라우저에서 내 브라우저로 가는 것이라 친구 생년월일은 싣지 않고(기둥만), 받는 쪽에 동물원이 있으면 덮어쓰지 않는다.
+   ===================================================================== */
+const UA=navigator.userAgent;
+// let인 이유: 검증 때 __zoo.setEnv()로 아이폰·카톡을 흉내 내려고. 미리보기는 그 UA를 못 만든다
+let IN_APP = /KAKAOTALK/i.test(UA) ? 'kakao'
+  : /Instagram|FBAN|FBAV|NAVER\(inapp|DaumApps|Line\/|BAND\/|everytimeApp/i.test(UA) ? 'other' : null;
+let IS_IOS = /iPhone|iPad|iPod/.test(UA) || (navigator.platform==='MacIntel' && navigator.maxTouchPoints>1);
+let IS_ANDROID = /Android/i.test(UA);
+const isStandalone=()=>{ try{ return matchMedia('(display-mode: standalone)').matches || navigator.standalone===true; }catch(e){ return false; } };
+let BIP=null, A2HS_FORCE=false;
+addEventListener('beforeinstallprompt',e=>{ e.preventDefault(); BIP=e; renderA2HS(); });
+addEventListener('appinstalled',()=>{ BIP=null; store.set('zoo_a2hs',JSON.stringify({done:Date.now()})); A2HS_FORCE=false; renderA2HS(); toast('홈 화면에 동물원이 생겼어요 🐾'); });
+function a2hsMode(){
+  if(isStandalone()) return null;
+  if(IN_APP) return 'inapp';
+  if(BIP) return 'prompt';
+  if(IS_IOS) return 'ios';
+  return IS_ANDROID ? 'android' : 'other';
+}
+const a2hsClosed=()=>{ try{ return !!JSON.parse(store.get('zoo_a2hs')||'null'); }catch(e){ return false; } };
+function moveURL(){
+  const o={me:ME, f:FRIENDS.map(f=>({n:f.name,c:f.cat||null,u:f.sub||null,s:f.saju.stems,b:f.saju.branches}))};
+  return location.href.split('#')[0].split('?')[0]+'#m='+b64e(JSON.stringify(o));
+}
+function renderA2HS(){
+  const box=$('a2hs-card'); if(!box) return;
+  const mode=a2hsMode();
+  $('a2hs-linkwrap').classList.toggle('hide', !mode);
+  // 저절로 뜨는 건 할 수 있는 게 분명할 때만(설치 버튼·아이폰 순서·앱 안 브라우저). 닫았으면 다시 안 띄운다.
+  // 그 밖(설치 버튼을 못 받은 안드로이드·PC)은 아래 「홈 화면에 두는 법」을 눌렀을 때만
+  const auto = ['prompt','ios','inapp'].includes(mode) && !a2hsClosed();
+  if(!ME || !mode || !(auto||A2HS_FORCE)){ box.classList.add('hide'); return; }
+  box.classList.remove('hide');
+  const head=`<img class="ai" src="apple-touch-icon.png" alt="" onerror="this.style.display='none'">`;
+  const x=`<button class="ax" id="a2hs-x" aria-label="닫기">✕</button>`;
+  let body='';
+  if(mode==='prompt') body=`<div class="at">동물원을 홈 화면에 두기</div>
+      <div class="ad">다음부터 아이콘 한 번이면 ${nim(ME.name)}의 네 마리가 바로 열려요. 가입은 없어요.</div>
+      <div class="acts"><button class="btn sm" id="a2hs-go">홈 화면에 추가</button></div>`;
+  else if(mode==='ios') body=`<div class="at">동물원을 홈 화면에 두기</div>
+      <div class="ad">아이폰은 버튼 하나로는 안 되고, 세 번 누르면 돼요.</div>
+      <ol><li>화면 아래 <b>공유</b> 버튼 <span style="font-size:15px">⬆︎</span> (네모에서 화살표가 나온 모양)</li>
+        <li>목록을 내려 <b>「홈 화면에 추가」</b></li><li>오른쪽 위 <b>「추가」</b></li></ol>
+      <div class="acts"><button class="btn sm ghost" id="a2hs-ok">알겠어요</button></div>`;
+  else if(mode==='inapp') body=`<div class="at">${IN_APP==='kakao'?'카톡':'이 앱'} 안에서는 홈 화면에 못 둬요</div>
+      <div class="ad"><b>크롬이나 사파리</b>로 열면 둘 수 있어요. 아래로 열면 <b>지금 동물원도 같이 옮겨 갑니다.</b></div>
+      <div class="acts">
+        ${IN_APP==='kakao'?'<button class="btn sm" id="a2hs-ext">다른 브라우저로 열기</button>':''}
+        <button class="btn sm ${IN_APP==='kakao'?'ghost':''}" id="a2hs-copy">옮겨 갈 주소 복사</button></div>
+      <div class="ad" style="margin-top:8px">안 열리면: 오른쪽 아래(또는 위) <b>⋮ / ⋯ 메뉴 → 「다른 브라우저로 열기」</b>. 복사한 주소를 크롬·사파리 주소창에 붙여넣어도 돼요.</div>`;
+  else body=`<div class="at">동물원을 홈 화면에 두기</div>
+      <div class="ad">브라우저 메뉴(<b>⋮</b>)에서 <b>「홈 화면에 추가」</b> 또는 <b>「앱 설치」</b>를 누르세요.${IS_ANDROID?' 메뉴에 없으면 이미 홈 화면에 있을 수 있어요.':''}</div>`;
+  box.innerHTML=head+`<div class="ab">${body}</div>`+x;
+  const close=()=>{ store.set('zoo_a2hs',JSON.stringify({closed:Date.now(),mode})); A2HS_FORCE=false; renderA2HS(); };
+  $('a2hs-x').addEventListener('click',close);
+  $('a2hs-ok')&&$('a2hs-ok').addEventListener('click',close);
+  $('a2hs-go')&&$('a2hs-go').addEventListener('click',async()=>{
+    if(!BIP) return; const e=BIP; BIP=null;
+    try{ e.prompt(); const r=await e.userChoice; if(r&&r.outcome==='dismissed') toast('언제든 맨 아래 「홈 화면에 두는 법」에서 다시 할 수 있어요'); }catch(err){}
+    renderA2HS();
+  });
+  // ⚠️ kakaotalk://web/openExternal 은 카카오 공식 문서에 없는 주소다. 안 되는 기기가 있다는 제보도 있다 — 그래서 손으로 하는 길을 늘 같이 적는다
+  $('a2hs-ext')&&$('a2hs-ext').addEventListener('click',()=>{ location.href='kakaotalk://web/openExternal?url='+encodeURIComponent(moveURL()); });
+  $('a2hs-copy')&&$('a2hs-copy').addEventListener('click',async()=>{
+    try{ await navigator.clipboard.writeText(moveURL()); toast('주소를 복사했어요 — 크롬·사파리 주소창에 붙여넣으세요'); }
+    catch(e){ toast('길게 눌러 복사해 주세요'); }
+  });
+}
+$('btn-a2hs-link').addEventListener('click',()=>{ A2HS_FORCE=true; renderA2HS();
+  $('a2hs-card').scrollIntoView({behavior:'smooth',block:'center'}); });
+if('serviceWorker' in navigator && /^https?:$/.test(location.protocol)){
+  addEventListener('load',()=>{ navigator.serviceWorker.register('sw.js').catch(()=>{}); });
+}
+
+/* ---------- 부팅 ---------- */
 function boot(hashOverride, keepState){
   if(!keepState) load();        // 미리보기로 들어올 땐 저장된 걸 다시 읽지 않는다
   const h=(hashOverride!==undefined?hashOverride:location.hash).replace(/^#/,'');
+  /* 데모 씨앗 — 사람들에게 보여주고 피드백 받을 때 쓴다 (2026-08-27 다현님)
+     네 카테고리(가족·직장·친구·연인)에 한 명씩 채운 관계도를 한 번에 만든다.
+     ⚠️ 실제 기록을 덮어쓰지 않는다 — 있던 것은 따로 넣어두고 '#demo-off'로 그대로 되돌린다.
+        (일정.txt를 통째로 덮어써 손입력을 잃은 적이 있다 — 씨앗은 반드시 되돌릴 길과 함께 낸다) */
+  if(h==='demo'||h==='demo-off'){
+    if(hashOverride===undefined) history.replaceState(null,'',location.href.split('#')[0]);
+    HOST=null; GUEST=null; window.__viewFriend=null;
+    if(h==='demo-off'){
+      const b=store.get(DEMO_BAK);
+      if(b){ try{ const d=JSON.parse(b); ME=d.me; FRIENDS=d.friends||[]; purchase=d.purchase||purchase;
+                  store.set(DEMO_BAK,''); saveLocal(); toast('원래 동물원으로 돌아왔어요 🐾'); }
+             catch(e){ toast('되돌리다 실패했어요'); } }
+      else toast('되돌릴 기록이 없어요');
+      renderTimeUI(); if(ME){renderAll(); show('zoo');} else {renderBrand(); renderTodayChip(); show('input');}
+      return;
+    }
+    if(!store.get(DEMO_BAK)) store.set(DEMO_BAK, JSON.stringify({me:ME,friends:FRIENDS,purchase}));
+    const P=(name,date,time,cat,sub)=>({name, cat, sub:sub||null, saju:computeSaju(date,time,true)});
+    ME = ME || P('다현','1994-11-03',null);
+    FRIENDS = [
+      // 실제 가족·지인 이름을 쓰지 않는다 — 남에게 보여주는 화면이고, 낮은 점수가 실명에 붙으면 곤란해진다
+      P('엄마',  '1968-03-12', null,  '가족', '부모'),
+      P('지현',  '1991-09-04', '14:20','직장'),
+      P('수빈',  '1996-12-19', '21:10','친구'),
+      P('준호',  '1988-11-03', '06:45','연인')
+    ];
+    /* 네 명이면 무료 3자리를 넘는다. 딱 맞게 늘리면 「자리 다 찼어요」가 되어
+       관계도 맨 위가 통째로 결제 비교표가 된다 — 보여주려던 건 그게 아니다.
+       여유 자리를 두어 관계도가 먼저 보이게 한다 (2026-08-27 화면으로 확인하고 고침) */
+    purchase.slots = Math.max(purchase.slots, FRIENDS.length - FREE_LIMIT + 2);
+    saveLocal(); renderTimeUI(); renderAll(); show('map');
+    toast('데모 관계도를 채웠어요 — 되돌리려면 주소 뒤에 #demo-off');
+    return;
+  }
   if(h.startsWith('i=')){
     try{
       HOST=unpackPerson(h.slice(2));
@@ -2176,12 +2538,47 @@ function boot(hashOverride, keepState){
       show('input'); renderBrand(); renderTimeUI(); renderTodayChip(); return;
     }catch(e){}
   }
+  /* 다른 브라우저로 옮겨 온 동물원 (2026-10-04) — 카톡 안에서 만든 걸 크롬·사파리로 들고 온다.
+     ⚠️ 이 브라우저에 이미 동물원이 있으면 덮어쓰지 않는다 — 사용자 기록은 묻지 않고 지우지 않는다 */
+  if(h.startsWith('m=')){
+    try{
+      const o=JSON.parse(b64d(h.slice(2)));
+      if(hashOverride===undefined) history.replaceState(null,'',location.href.split('#')[0]);
+      HOST=null; GUEST=null; window.__viewFriend=null;
+      if(ME) toast('이 브라우저엔 이미 동물원이 있어요 — 덮어쓰지 않았어요');
+      else if(o.me){
+        ME=o.me;
+        FRIENDS=(o.f||[]).map(x=>({name:x.n, cat:migrateCat(x.c), sub:x.u||null, saju:{stems:x.s,branches:x.b,hasTime:x.b[3]!==null,warn:[]}}));
+        saveLocal(); toast(`${nim(ME.name)}의 동물원을 옮겨 왔어요 🐾 친구 ${FRIENDS.length}명`);
+      }
+      renderTimeUI(); if(ME){ renderAll(); show('zoo'); } else { renderBrand(); renderTodayChip(); show('input'); }
+      return;
+    }catch(e){}
+  }
+  /* 친구가 생일을 넣고 되돌려준 회신 링크 — 누르기만 하면 들어온다 (2026-08-26) */
+  if(h.startsWith('b=')){
+    try{
+      const p=unpackPerson(h.slice(2));
+      /* 회신 링크는 '남의 동물원에 놀러 온 자리'가 아니다 — 손님 상태를 반드시 지운다.
+         안 지우면 내 생일을 넣어도 손님 취급이라 궁합 화면으로 빠진다 (2026-08-26 검증에서 잡음) */
+      HOST=null; GUEST=null; window.__viewFriend=null;
+      // 주소에 남겨두면 새로고침할 때마다 다시 들어온다
+      if(hashOverride===undefined) history.replaceState(null,'',location.href.split('#')[0]);
+      renderTimeUI(); renderBrand(); renderTodayChip();
+      if(ME){ addPerson(p); return; }
+      // 내 동물원이 아직 없을 때 — 친구를 버리지 않고 들고 있다가 만들자마자 넣는다
+      PENDING_BACK=p; show('input');
+      toast(`${nim(p.name)}이 기다리고 있어요 — 먼저 내 생년월일을 넣어주세요`);
+      return;
+    }catch(e){}
+  }
   renderTimeUI();
   if(ME){ renderAll(); show('zoo'); }
   else { renderBrand(); renderTodayChip(); show('input'); }
 }
 boot();
 
+/* ---------- 검증용 노출 ---------- */
 window.__zoo={computeSaju,compat,branchRel,luckScore,dayGanjiIdx,ANIMALS,BRANCHES,STEMS,ganjiStr,jeolOf,boot,calibrate,lowNote,
   lunarToSolar,lunarYear,lunarMonthInfo,hasLeapMonth,newMoonJD,jdnToYMD,deltaT,hourBlocks,
   ohaeng,ohaengFit,strength,tenGodRole,ELEMENTS,EL,
@@ -2191,7 +2588,8 @@ window.__zoo={computeSaju,compat,branchRel,luckScore,dayGanjiIdx,ANIMALS,BRANCHE
   get ACCOUNT(){return ACCOUNT}, set ACCOUNT(v){ACCOUNT=v},
   get HOST(){return HOST}, get GUEST(){return GUEST},
   get ME(){return ME}, set ME(v){ME=v}, get FRIENDS(){return FRIENDS}, set FRIENDS(v){FRIENDS=v},
-  renderAll, show, save, packPerson, unpackPerson, gradeOf};
+  renderAll, show, save, packPerson, unpackPerson, gradeOf,
+  a2hsMode, renderA2HS, moveURL, setEnv(o){ if('inApp' in o)IN_APP=o.inApp; if('ios' in o)IS_IOS=o.ios; if('android' in o)IS_ANDROID=o.android; }, get BIP(){return BIP}, set BIP(v){BIP=v}, set A2HS_FORCE(v){A2HS_FORCE=v}};
 </script>
 </body>
 </html>

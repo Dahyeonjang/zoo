@@ -1,0 +1,18 @@
+{
+  "name": "사주동물원 · 나와 함께 걷는 네 마리",
+  "short_name": "사주동물원",
+  "description": "생년월일 속 네 마리 동물을 만나고, 링크로 친구를 불러 궁합과 관계도를 만드는 웹앱",
+  "id": "./",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#FBF7EF",
+  "theme_color": "#F0885A",
+  "lang": "ko",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
